@@ -1,9 +1,0 @@
----
-layout: post
-title: "A New Hope"
-date: 2013-08-08 01:10
-comments: true
-categories: 
----
-
-New Octopress blog set up here at adarsh.github.io.
