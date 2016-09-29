@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--[if IE]><script src='http://html5shiv.googlecode.com/svn/trunk/html5.js'></script><![endif]-->
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta content='width=device-width' name='viewport'>
+<meta content='Monkeypatching `.find` in ActiveRecord models can lead to confusion' name='description'>
+<title>Using GlobalID with Alternative Primary Keys</title>
+<link href='feed.xml' rel='alternate' title='RSS' type='application/rss+xml'>
+<link href="/stylesheets/all-d937b735.css" rel="stylesheet" />
+<link href='https://plus.google.com/116006351214905134217' rel='author'>
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-1322480-9', 'auto');
+  ga('send', 'pageview');
+</script>
+</head>
+<body>
+<div class='body-container'>
+<div class='header-container'>
+<h1 class='blog-title'>
+<a href="http://hotlinewebring.club/adarsh/previous" title="Yes, this is a webring">←</a>
+<a href="/">Adarsh Pandit</a>
+<a href="http://hotlinewebring.club/adarsh/next" title="Yes, this is a webring">→</a>
+</h1>
+<h2 class='blog-subtitle'>
+Software Developer
+</h2>
+
+</div>
+<div class='article-container'>
+<h3 class='article-title'>
+<a href="/using-globalid-with-alternative-primary-keys">Using GlobalID with Alternative Primary Keys</a>
+</h3>
+<h6 class='timestamp'>
+<time>May 27, 2015</time>
+<span>
+By <a href="/">Adarsh Pandit</a>
+</span>
+<span>
+in
+<a href="/categories/programming">programming</a>
+</span>
+</h6>
+<div class='content'>
+<p>I like the new universal job interface for Rails, <a href="https://github.com/rails/rails/tree/master/activejob">ActiveJob</a>.
+I&rsquo;ve done this kind of job class creation before, usually with <a href="https://github.com/collectiveidea/delayed_job">DelayedJob</a>.
+It makes job behavior much easier to test inside an object
+(or &ldquo;PORO&rdquo; as the kids say)
+and encapsulates the logic nicely.</p>
+
+<p>However note the following important attributes of background jobs in Rails:</p>
+
+<ul>
+<li>ActiveRecord models are dynamic and change frequently.</li>
+<li>Background jobs can have a variable amount of time
+between when they are created and when they run.</li>
+</ul>
+
+<p>Together, these two facts mean we can&rsquo;t directly pass in AR objects
+when creating a job
+because the model attributes may change
+ between when we create the job and when it runs.
+That could be bad.</p>
+
+<p>To avoid these errors, you can pass in
+an ActiveRecord object&rsquo;s ID as a parameter
+when you enqueue a job.
+Then when the job is ready to run,
+you can look up the model
+and have the current state:</p>
+<pre class="highlight ruby"><code><span class="c1"># app/jobs/email_user_job.rb</span>
+<span class="k">class</span> <span class="nc">EmailUserJob</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="vi">@user_id</span> <span class="o">=</span> <span class="n">user_id</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">perform</span>
+    <span class="no">UserMailer</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">deliver</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="kp">attr_reader</span> <span class="ss">:user_id</span>
+
+  <span class="k">def</span> <span class="nf">user</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+
+<span class="c1"># Somewhere</span>
+<span class="n">job</span> <span class="o">=</span> <span class="no">EmailUserJob</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="nf">id</span><span class="p">)</span>
+<span class="no">Delayed</span><span class="o">::</span><span class="no">Job</span><span class="p">.</span><span class="nf">enqueue</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+</code></pre>
+<p>I love the implementation of <a href="https://github.com/rails/globalid">GlobalID</a> with ActiveJob
+because it eliminates this dehydrate-rehydrate cycle.</p>
+
+<p>With GlobalID/ActiveJob, now we can just pass in the AR object directly:</p>
+<pre class="highlight ruby"><code><span class="c1"># app/jobs/email_user_job.rb</span>
+<span class="k">class</span> <span class="nc">EmailUserJob</span> <span class="o">&lt;</span> <span class="no">ActiveJob</span><span class="o">::</span><span class="no">Base</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="vi">@user</span> <span class="o">=</span> <span class="n">user</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="no">UserMailer</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">deliver</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># somewhere</span>
+<span class="no">EmailUserJob</span><span class="p">.</span><span class="nf">perform_later</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</code></pre>
+<p>Nice! How does it work?</p>
+
+<p>GlobalID creates a URI with the app name, model name, and primary key:</p>
+<pre class="highlight ruby"><code><span class="n">user_guid</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nf">to_global_id</span>
+<span class="c1"># =&gt; #&lt;GlobalID:0x007f87cc9f96c8 @uri=#&lt;URI::GID gid://app-name/User/1&gt;&gt;</span>
+<span class="n">user_guid</span><span class="p">.</span><span class="nf">to_s</span>
+<span class="c1">#=&gt; "gid://app-name/User/1"</span>
+</code></pre>
+<p>Super intuitive, right?
+You can also see how this would be useful across apps
+in a service-oriented architecture.</p>
+
+<p>This is all great except I ran into this problem recently while using GlobalID:</p>
+<pre class="highlight ruby"><code><span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">007</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">team</span> <span class="o">=</span> <span class="no">Team</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;Team id: 1, created_at: "2015-05-07 17:08:14", updated_at: "2015-05-07 17:08:14", token: "bdfab17ca84712d2" 10&gt;</span>
+
+<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">00</span><span class="mi">8</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">gid</span> <span class="o">=</span> <span class="n">team</span><span class="p">.</span><span class="nf">to_global_id</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;GlobalID:0x007f79dc7b1d00 @uri=#&lt;URI::GID gid://app-name/Team/4&gt;&gt;</span>
+
+<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">00</span><span class="mi">9</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="no">GlobalID</span><span class="o">::</span><span class="no">Locator</span><span class="p">.</span><span class="nf">locate</span><span class="p">(</span><span class="n">gid</span><span class="p">)</span>
+  <span class="no">Team</span> <span class="no">Load</span> <span class="p">(</span><span class="mi">1</span><span class="o">.</span><span class="mi">6</span><span class="n">ms</span><span class="p">)</span>  <span class="no">SELECT</span>  <span class="s2">"teams"</span><span class="p">.</span><span class="nf">*</span> <span class="no">FROM</span> <span class="s2">"teams"</span> <span class="no">WHERE</span> <span class="s2">"teams"</span><span class="o">.</span><span class="s2">"token"</span> <span class="o">=</span> <span class="vg">$1</span> <span class="no">LIMIT</span> <span class="mi">1</span>  <span class="p">[[</span><span class="s2">"token"</span><span class="p">,</span> <span class="s2">"4"</span><span class="p">]]</span>
+  <span class="no">Team</span> <span class="no">Load</span> <span class="p">(</span><span class="mi">1</span><span class="o">.</span><span class="mi">6</span><span class="n">ms</span><span class="p">)</span>  <span class="no">SELECT</span>  <span class="s2">"teams"</span><span class="p">.</span><span class="nf">*</span> <span class="no">FROM</span> <span class="s2">"teams"</span> <span class="no">WHERE</span> <span class="s2">"teams"</span><span class="o">.</span><span class="s2">"token"</span> <span class="o">=</span> <span class="vg">$1</span> <span class="no">LIMIT</span> <span class="mi">1</span>  <span class="p">[[</span><span class="s2">"token"</span><span class="p">,</span> <span class="s2">"4"</span><span class="p">]]</span>
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">RecordNotFound</span><span class="p">:</span> <span class="no">Couldn</span><span class="s1">'t find Team
+        from /app/vendor/bundle/ruby/2.2.0/gems/activerecord-4.2.1/lib/active_record/core.rb:196:in `find_by!'</span>
+        <span class="n">from</span> <span class="sr">/app/</span><span class="n">vendor</span><span class="o">/</span><span class="n">bundle</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="mi">2</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">activerecord</span><span class="o">-</span><span class="mi">4</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">1</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">active_record</span><span class="o">/</span><span class="n">dynamic_matchers</span><span class="p">.</span><span class="nf">rb</span><span class="p">:</span><span class="mi">70</span><span class="ss">:in</span> <span class="sb">`find_by_token!'
+        from /app/app/models/team.rb:7:in `</span><span class="n">find</span><span class="s1">'
+        from /app/vendor/bundle/ruby/2.2.0/gems/globalid-0.3.5/lib/global_id/locator.rb:140:in `locate'</span>
+        <span class="n">from</span> <span class="sr">/app/</span><span class="n">vendor</span><span class="o">/</span><span class="n">bundle</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="mi">2</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">globalid</span><span class="o">-</span><span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">global_id</span><span class="o">/</span><span class="n">locator</span><span class="p">.</span><span class="nf">rb</span><span class="p">:</span><span class="mi">17</span><span class="ss">:in</span> <span class="sb">`locate'
+# ...
+</span></code></pre>
+<p>Huh?</p>
+
+<p>Then I realized <code>Team.find</code> had been monkeypatched
+to use a different primary key:</p>
+<pre class="highlight ruby"><code><span class="k">class</span> <span class="nc">Team</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+    <span class="n">find_by_token!</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">to_param</span>
+    <span class="n">token</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">generate_token</span>
+    <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">token</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">token</span> <span class="o">=</span> <span class="no">SecureRandom</span><span class="p">.</span><span class="nf">hex</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre>
+<p>So this is clearly unexpected behavior on the part of GlobalID,
+but it makes sense.
+I&rsquo;ve changed it&rsquo;s URI construction parameters and it doesn&rsquo;t like that.
+Until we add a warning of some kind,
+the best course of action is to remove the monkeypatch
+and do a lookup on the token like:</p>
+<pre class="highlight ruby"><code><span class="no">Team</span><span class="p">.</span><span class="nf">find_by</span><span class="p">(</span><span class="ss">token: </span><span class="s2">"abc123"</span><span class="p">)</span>
+</code></pre>
+<p>I&rsquo;m really glad to see these libraries in Rails now.
+Try them out!</p>
+
+<div class='author'>
+<div class='pic'><img src="http://www.gravatar.com/avatar/692dad2af6224bf856e94a96049292c4.png" alt="692dad2af6224bf856e94a96049292c4" /></div>
+<div class='info'>
+<h6>Written by Adarsh Pandit</h6>
+<p>
+Read more <a href="/">posts by Adarsh</a>, and
+<a href="https://twitter.com/adarshp">follow Adarsh on Twitter</a>.
+</p>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class='footer-container'>
+<a href="../feed.xml">RSS Feed</a>
+|
+<a href="https://twitter.com/adarshp">@adarshp</a>
+
+</div>
+</div>
+</body>
+</html>

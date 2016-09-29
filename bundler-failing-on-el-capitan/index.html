@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--[if IE]><script src='http://html5shiv.googlecode.com/svn/trunk/html5.js'></script><![endif]-->
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta content='width=device-width' name='viewport'>
+<meta content='How to fix OpenSSL header issues after upgrading to OS X El Capitan' name='description'>
+<title>Bundler Failing on El Capitan</title>
+<link href='feed.xml' rel='alternate' title='RSS' type='application/rss+xml'>
+<link href="/stylesheets/all-d937b735.css" rel="stylesheet" />
+<link href='https://plus.google.com/116006351214905134217' rel='author'>
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-1322480-9', 'auto');
+  ga('send', 'pageview');
+</script>
+</head>
+<body>
+<div class='body-container'>
+<div class='header-container'>
+<h1 class='blog-title'>
+<a href="http://hotlinewebring.club/adarsh/previous" title="Yes, this is a webring">←</a>
+<a href="/">Adarsh Pandit</a>
+<a href="http://hotlinewebring.club/adarsh/next" title="Yes, this is a webring">→</a>
+</h1>
+<h2 class='blog-subtitle'>
+Software Developer
+</h2>
+
+</div>
+<div class='article-container'>
+<h3 class='article-title'>
+<a href="/bundler-failing-on-el-capitan">Bundler Failing on El Capitan</a>
+</h3>
+<h6 class='timestamp'>
+<time>Nov 9, 2015</time>
+<span>
+By <a href="/">Adarsh Pandit</a>
+</span>
+<span>
+in
+<a href="/categories/rails">rails</a>
+</span>
+</h6>
+<div class='content'>
+<p>After updating to El Capitan,
+installing new gems
+started to fail.
+It looked something like this:</p>
+<pre class="highlight plaintext"><code>Building native extensions.  This could take a while...
+ERROR:  Error installing awesome_gem_name:
+    ERROR: Failed to build gem native extension.
+
+checking for rb_trap_immediate in ruby.h,rubysig.h... no
+checking for rb_thread_blocking_region()... no
+...
+CFLAGS=-O3 -I/Users/haven/.sm/pkg/active/include -fPIC -mmacosx-version-min=10.7 -pipe  -Wall -Wextra -Wno-deprecated-declarations -Wno-ignored-qualifiers -Wno-unused-result
+CPPFLAGS=-D_XOPEN_SOURCE -D_DARWIN_C_SOURCE -D_DARWIN_UNLIMITED_SELECT -D_REENTRANT $(DEFS) $(cppflags) -Wall -Wextra -Wno-deprecated-declarations -Wno-ignored-qualifiers -Wno-unused-result
+checking for clock_gettime()... no
+checking for gethrtime()... no
+creating Makefile
+
+make "DESTDIR=" clean
+
+make "DESTDIR="
+compiling binder.cpp
+</code></pre>
+<p>But here&rsquo;s the important part:</p>
+<pre class="highlight plaintext"><code>In file included from binder.cpp:20:
+./project.h:116:10: fatal error: 'openssl/ssl.h' file not found
+</code></pre>
+<h2><a href="https://www.youtube.com/watch?v=k5Cfhooa1bI">Wha happened?</a></h2>
+
+<p>As of OS X El Capitan,
+Apple no longer provides OpenSSL headers.</p>
+
+<p>&ldquo;But wait, I have OpenSSL!,&rdquo; you cry.</p>
+<pre class="highlight plaintext"><code>$ which openssl
+/usr/bin/openssl
+</code></pre>
+<p>Yes you do, but you lack the <a href="http://www.tutorialspoint.com/cprogramming/c_header_files.htm">C <em>headers</em></a>
+which some gems use to build
+native extensions.</p>
+
+<p>Think of the headers as the source code
+and <code>/usr/bin/openssl</code> as the compiled binary.</p>
+
+<p>Apple no longer ships the headers
+on which many gems with native C extensions depend.
+For more on why, <a href="https://lists.apple.com/archives/macnetworkprog/2015/Jun/msg00025.html">read this post</a></p>
+<pre class="highlight shell"><code><span class="c"># On earlier OS X:</span>
+<span class="gp">$ </span>ls /usr/include/openssl/ssl.h
+/usr/include/openssl/ssl.h
+
+<span class="c"># On El Capitan:</span>
+<span class="gp">$ </span>ls /usr/include/openssl/ssl.h
+ls: /usr/include/ssl.h: No such file or directory
+</code></pre>
+<h2><a href="https://www.youtube.com/watch?v=yo3uxqwTxk0">Fix It!</a></h2>
+
+<p>You can install your own OpenSSL headers
+using either Homebrew or MacPorts.
+I&rsquo;m a Homebrew guy so let&rsquo;s go that route.</p>
+
+<p>First let&rsquo;s uninstall whatever you have,
+if anything:</p>
+<pre class="highlight plaintext"><code>$ brew uninstall openssl --force
+</code></pre>
+<p>The <code>--force</code> bit will &ldquo;remove out-of-date keg-only brews as well&rdquo;
+(see the <code>man brew</code> page).</p>
+
+<p>I couldn&rsquo;t get this to work
+unless I updated my
+XCode Command Line tools
+after upgrading to El Capitan.</p>
+
+<p>So let&rsquo;s do that:</p>
+<pre class="highlight plaintext"><code>$ xcode-select --install
+</code></pre>
+<p>Be sure to agree to everything,
+not just in the dialogue boxes OS X presents,
+but in life - just try to say yes more.
+(NOTE: Any philosophical disagreements
+are beyond the scope of this blog post
+and left as an exercise for the reader.)</p>
+
+<p>When that is finished,
+then install OpenSSL
+and force symlinking
+into the appropriate places:</p>
+<pre class="highlight plaintext"><code>$ brew update
+$ brew install openssl
+$ brew link --force openssl
+</code></pre>
+<p>Now your <code>bundle install</code> should work no problem!</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks to Gabe Berke-Williams for helpful edits.
+Read <a href="http://gabebw.com/">his amazing blog</a>
+or follow <a href="https://twitter.com/gabebw">his pun-filled Twitter feed</a>
+or investigate <a href="https://github.com/gabebw">his myriad of interesting GitHub projects.</a></p>
+
+<div class='author'>
+<div class='pic'><img src="http://www.gravatar.com/avatar/692dad2af6224bf856e94a96049292c4.png" alt="692dad2af6224bf856e94a96049292c4" /></div>
+<div class='info'>
+<h6>Written by Adarsh Pandit</h6>
+<p>
+Read more <a href="/">posts by Adarsh</a>, and
+<a href="https://twitter.com/adarshp">follow Adarsh on Twitter</a>.
+</p>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class='footer-container'>
+<a href="../feed.xml">RSS Feed</a>
+|
+<a href="https://twitter.com/adarshp">@adarshp</a>
+
+</div>
+</div>
+</body>
+</html>

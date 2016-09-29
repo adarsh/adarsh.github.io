@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--[if IE]><script src='http://html5shiv.googlecode.com/svn/trunk/html5.js'></script><![endif]-->
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta content='width=device-width' name='viewport'>
+<meta content='How to import a WordPress blog into Octopress' name='description'>
+<title>Episode 4, A New Blog</title>
+<link href='feed.xml' rel='alternate' title='RSS' type='application/rss+xml'>
+<link href="/stylesheets/all-d937b735.css" rel="stylesheet" />
+<link href='https://plus.google.com/116006351214905134217' rel='author'>
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-1322480-9', 'auto');
+  ga('send', 'pageview');
+</script>
+</head>
+<body>
+<div class='body-container'>
+<div class='header-container'>
+<h1 class='blog-title'>
+<a href="http://hotlinewebring.club/adarsh/previous" title="Yes, this is a webring">←</a>
+<a href="/">Adarsh Pandit</a>
+<a href="http://hotlinewebring.club/adarsh/next" title="Yes, this is a webring">→</a>
+</h1>
+<h2 class='blog-subtitle'>
+Software Developer
+</h2>
+
+</div>
+<div class='article-container'>
+<h3 class='article-title'>
+<a href="/a-new-hope">Episode 4, A New Blog</a>
+</h3>
+<h6 class='timestamp'>
+<time>Aug 8, 2013</time>
+<span>
+By <a href="/">Adarsh Pandit</a>
+</span>
+<span>
+in
+<a href="/categories/blogging">blogging</a>
+</span>
+</h6>
+<div class='content'>
+<p>This is a new  Octopress blog set up here at adarsh.github.io using GitHub
+User Pages (different from Group/Repo pages).</p>
+
+<p>How I set it up (cribbed heavily from <a href="http://paulsturgess.co.uk/blog/2013/04/24/hello-octopress-and-github-pages/">this post by Paul Sturgess</a>):</p>
+
+<!-- more -->
+
+<h2>Initial setup</h2>
+
+<p>Create a new repo named <code>username.github.io</code> cloned from the Octopress repo:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>git clone git://github.com/imathis/octopress.git adarsh.github.io
+<span class="gp">$ </span><span class="nb">cd </span>adarsh.github.io
+</code></pre>
+<p>I&rsquo;m not sure it matters much, but I use ruby 2.0.0-p247 under rbenv:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nb">echo</span> <span class="s1">'2.0.0-p247'</span> &gt; .ruby-version
+<span class="gp">$ </span>gem install bundler
+<span class="gp">$ </span>bundle install
+</code></pre>
+<p>Skip the installation of the default theme (<code>$ rake install</code>) - we&rsquo;ll install
+something nicer in a moment.</p>
+
+<h2>Setup GitHub User Pages</h2>
+
+<p>Octopress has a nice Rake task for setting up a blog under GitHub Pages:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>rake setup_github_pages
+</code></pre>
+<p>This does a bunch of stuff. I&rsquo;ll let <a href="http://paulsturgess.co.uk/blog/2013/04/24/hello-octopress-and-github-pages/">Paul</a> explain more clearly:</p>
+
+<blockquote>
+<p>This task does quite a few things. The most important is that it creates a new _deploy directory that is another git repository. This is where Octopress generates the flat website for deployment to the master branch of your repo on Github.</p>
+
+<p>All the Octopress code used to generate the website into the <code>_deploy</code> directory now lives in new branch called source. Note in the source branch the <code>.gitignore</code> includes <code>_deploy</code> so it doesn’t get committed in two places!</p>
+
+<p>This sounds more complicated than it is, Octopress has rake tasks to make this really easy to manage. It’s worth pushing up at this point to check everything works before tinkering:</p>
+
+<p><code>$ rake generate deploy</code></p>
+
+<p>This copies the generated files into _deploy, adds them to git, commits and pushes them up to the master branch.</p>
+
+<p>Visit http://yourgithubusername.github.io and check it out</p>
+</blockquote>
+
+<h2>Add a Theme</h2>
+
+<p>While Octopress is pretty great out of the box, the default theme is a little
+stale. I&rsquo;m using <a href="https://github.com/tlvince/leanpress">LeanPress</a>:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/tlvince/leanpress.git .themes/leanpress
+<span class="gp">$ </span>rake install<span class="se">\[</span><span class="s1">'leanpress'</span><span class="se">\]</span>
+<span class="gp">$ </span>rake generate
+</code></pre>
+<p>There&rsquo;s a gotcha here for zsh users: Under zsh, these rake commands with square
+brackets need escaping. I think it&rsquo;s okay to skip this under bash.</p>
+
+<h2>Configure <code>_config.yml</code></h2>
+
+<p>There&rsquo;s a ton of stuff in here, but for now, just edit the stuff at the top:</p>
+<pre class="highlight plaintext"><code># ----------------------- #
+#      Main Configs       #
+# ----------------------- #
+
+url: http://adarsh.github.io
+title: adarsh.github.io
+subtitle: a development blog
+author: Adarsh Pandit
+simple_search: http://google.com/search
+description:
+</code></pre>
+<h2>Add Posts</h2>
+<pre class="highlight shell"><code><span class="gp">$ </span>rake new_post<span class="se">\[</span><span class="s1">'Episode 4: A New Blog'</span><span class="se">\]</span>
+</code></pre>
+<p>This generates a <code>source/_posts/2013-08-08-a-new-hope.markdown</code> file. Edit it up
+and set up preview:</p>
+<pre class="highlight shell"><code><span class="c"># In another pane/tab</span>
+<span class="gp">$ </span>rake watch     <span class="c"># will regenerate the html/css after any changes</span>
+
+<span class="c"># In yet another pane/tab</span>
+<span class="gp">$ </span>rake preview   <span class="c"># preview page at http://localhost:4000</span>
+</code></pre>
+<p>Deploy again and commit the source:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>rake generate deploy
+<span class="gp">$ </span>git commit -am <span class="s1">'First Commit and post!'</span>
+<span class="gp">$ </span>git push
+</code></pre>
+<h2>Profit</h2>
+
+<p>Profit!</p>
+
+<div class='author'>
+<div class='pic'><img src="http://www.gravatar.com/avatar/692dad2af6224bf856e94a96049292c4.png" alt="692dad2af6224bf856e94a96049292c4" /></div>
+<div class='info'>
+<h6>Written by Adarsh Pandit</h6>
+<p>
+Read more <a href="/">posts by Adarsh</a>, and
+<a href="https://twitter.com/adarshp">follow Adarsh on Twitter</a>.
+</p>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class='footer-container'>
+<a href="../feed.xml">RSS Feed</a>
+|
+<a href="https://twitter.com/adarshp">@adarshp</a>
+
+</div>
+</div>
+</body>
+</html>

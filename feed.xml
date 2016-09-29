@@ -1,0 +1,992 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Adarsh Pandit</title>
+  <subtitle>Personal Blog</subtitle>
+  <id>http://adarsh.io/</id>
+  <link href="http://adarsh.io/"/>
+  <link href="http://adarsh.io/feed.xml" rel="self"/>
+  <updated>2015-11-15T16:00:00-08:00</updated>
+  <author>
+    <name>Blog Author</name>
+  </author>
+  <entry>
+    <title>Save Money and Be Happier by Updating Your Gems Every Monday Morning</title>
+    <link rel="alternate" href="http://adarsh.io/save-money-and-be-happier-by-updating-your-gems-every-monday-morning"/>
+    <id>http://adarsh.io/save-money-and-be-happier-by-updating-your-gems-every-monday-morning</id>
+    <published>2015-11-15T16:00:00-08:00</published>
+    <updated>2016-09-28T21:18:10-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;p&gt;As a newcomer to Rails,
+understanding Gems and the Gemfile
+is fairly straightforward:
+You include a gem that you need
+and you get it included everywhere.&lt;/p&gt;
+
+&lt;p&gt;We don&amp;rsquo;t often think about it,
+but that last bit is important:
+we are literally &lt;code&gt;include&lt;/code&gt;ing
+all of the code from each gem
+into our application, all the time.&lt;/p&gt;
+
+&lt;p&gt;There are other implications of
+this &lt;code&gt;include&lt;/code&gt; behavior which should be considered,
+like speed
+but here I&amp;rsquo;m going to address one:
+Gem Drift and the associated cost.&lt;/p&gt;
+
+&lt;h2&gt;An Example&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s say I include an auth gem called &lt;code&gt;huge_bouncer&lt;/code&gt;
+in my app to do authentication and authorization.
+(Note: this is not a real gem, but a name I love.
+Feel free to use it but please attribute here
+so I can feel good about my gem-naming skills.)&lt;/p&gt;
+
+&lt;p&gt;Over time, the nice person who wrote &lt;code&gt;huge_bouncer&lt;/code&gt;
+reviews issues and PRs at night and on weekends
+and keeps development moving at a good pace.
+She is a saint and deserves an award
+or at least you should buy her a beer
+if you run into her at conference.&lt;/p&gt;
+
+&lt;p&gt;Newly released gem versions are, for the most part,
+new features and security patches
+(particularly in auth libraries).
+Not keeping up-to-date with new features
+is no big deal in the short term, really.
+I mean, yes, they built a nice OAuth DSL
+but we don&amp;rsquo;t use that in our app, so who cares.&lt;/p&gt;
+
+&lt;p&gt;Not keeping up to date with security patches is a bigger issue.
+You know who keeps up with those updates?
+&lt;a href="http://www.phrack.org/papers/attacking_ruby_on_rails.html"&gt;Bad people who want to target your innocent webapp.&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;You need to keep your app up to date,
+so how do you do it?&lt;/p&gt;
+
+&lt;h2&gt;Enter Robots&lt;/h2&gt;
+
+&lt;p&gt;Anything you need to do routinely
+should be automated, right?
+You can use &lt;a href="https://github.com/rubysec/bundler-audit"&gt;bundler-audit&lt;/a&gt;
+to regularly check for &lt;em&gt;reported&lt;/em&gt; security fixes.&lt;/p&gt;
+
+&lt;p&gt;It works like this:&lt;/p&gt;
+
+&lt;p&gt;Add the gem:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# Gemfile&lt;/span&gt;
+&lt;span class="c1"&gt;# ...&lt;/span&gt;
+&lt;span class="n"&gt;group&lt;/span&gt; &lt;span class="ss"&gt;:development&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;:test&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+  &lt;span class="n"&gt;gem&lt;/span&gt; &lt;span class="s1"&gt;'bundler-audit'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;require: &lt;/span&gt;&lt;span class="kp"&gt;false&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then set it up to check for vulnerabilities
+when you run the test suite:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# Rakefile&lt;/span&gt;
+&lt;span class="c1"&gt;# ...&lt;/span&gt;
+&lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="ss"&gt;default: &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="ss"&gt;:spec&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="ss"&gt;default: &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'bundler:audit'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# lib/tasks/bundler_audit.rake&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="no"&gt;Rails&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;env&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;development?&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="no"&gt;Rails&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;env&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;test?&lt;/span&gt;
+  &lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;'bundler/audit/cli'&lt;/span&gt;
+
+  &lt;span class="n"&gt;namespace&lt;/span&gt; &lt;span class="ss"&gt;:bundler&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="n"&gt;desc&lt;/span&gt; &lt;span class="s1"&gt;'Updates the ruby-advisory-db and runs audit'&lt;/span&gt;
+    &lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="ss"&gt;:audit&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+      &lt;span class="sx"&gt;%w(update check)&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+        &lt;span class="no"&gt;Bundler&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Audit&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;CLI&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;start&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+      &lt;span class="k"&gt;end&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Be sure to &lt;a href="/automatically-check-gem-vulnerabilities-in-circle-ci"&gt;add it to your CI as well&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Note there are &lt;a href="https://appcanary.com/"&gt;all sorts&lt;/a&gt; of nice
+&lt;a href="https://www.datadoghq.com/lpg/"&gt;paid services&lt;/a&gt; which also do
+this kind of thing.&lt;/p&gt;
+
+&lt;p&gt;Great! We&amp;rsquo;re covered, right?&lt;/p&gt;
+
+&lt;p&gt;Sorta. This will check the database
+of &lt;em&gt;reported&lt;/em&gt; security issues
+which is some subset of released security patches.
+I don&amp;rsquo;t blame gem maintainers for this:
+again, they&amp;rsquo;re working in their spare time
+for the greater good.
+Expecting them to keep up to date
+with more admin activities
+isn&amp;rsquo;t really fair.&lt;/p&gt;
+
+&lt;p&gt;So what can we do?&lt;/p&gt;
+
+&lt;h2&gt;A Path Forward&lt;/h2&gt;
+
+&lt;p&gt;I started doing something on projects recently
+which colleagues either don&amp;rsquo;t care about
+or appreciate me doing:&lt;/p&gt;
+
+&lt;p&gt;Monday morning,
+I take 15 minutes
+and run &lt;code&gt;bundle update&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Then I open a PR with the changes,
+and hopefully deploy within the hour
+once I get code review.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it.&lt;/p&gt;
+
+&lt;p&gt;The changes are very often quite minor
+and when they&amp;rsquo;re not,
+I look at the gem&amp;rsquo;s release notes
+and figure out what the changes are.
+If it&amp;rsquo;s a big change,
+say new deprecations or
+breaking changes,
+I fix them in about 30 minutes.
+People are pretty good about &lt;a href="http://semver.org/"&gt;SemVer&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Remember software is best changed
+in small iterations,
+and updating gems
+is still shipping software changes.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;HAHA, oh great plan but we are &lt;em&gt;way&lt;/em&gt; out of date already and can&amp;rsquo;t just jump right up to current.&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Of course. So here&amp;rsquo;s what you do:
+Go into the lockfile (&lt;code&gt;Gemfile.lock&lt;/code&gt;)
+and figure out what the specific versions
+are of things which are really far out of date.
+For example, let&amp;rsquo;s say &lt;code&gt;huge_bouncer&lt;/code&gt;
+is now at version 2.0.7,
+but we don&amp;rsquo;t know what we are locked at:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# Gemfile.lock&lt;/span&gt;
+&lt;span class="c1"&gt;# ...&lt;/span&gt;
+  &lt;span class="n"&gt;huge_bouncer&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;bcrypt&lt;/span&gt;
+    &lt;span class="n"&gt;email_validator&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;rails&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can use the &lt;a href="https://robots.thoughtbot.com/rubys-pessimistic-operator"&gt;twiddle-waka&lt;/a&gt; operator to say
+&amp;ldquo;when updating this gem,
+only do so to the next major version,&amp;rdquo;
+like so:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# Gemfile&lt;/span&gt;
+&lt;span class="n"&gt;gem&lt;/span&gt; &lt;span class="s1"&gt;'huge_bouncer'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'~&amp;gt; 1.2.4'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Okay so now we are not moving that much,
+and can do a safe &lt;code&gt;bundle_update&lt;/code&gt;
+without moving the versions too much.
+In this case, let&amp;rsquo;s say we get up to 1.2.8.
+This is an improvement!&lt;/p&gt;
+
+&lt;p&gt;Then, when we next have time,
+we can loosen the restrictions a bit,
+&lt;code&gt;bundle update&lt;/code&gt; again,
+and see if all is okay.&lt;/p&gt;
+
+&lt;p&gt;Remember, we want to make and deploy
+small changes, so don&amp;rsquo;t get all crazy.&lt;/p&gt;
+
+&lt;h2&gt;Wait, What About Robots Again?&lt;/h2&gt;
+
+&lt;p&gt;Shouldn&amp;rsquo;t you build or pay for some service
+which does this for you?&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;NO&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;You are including a heck-ton of other code
+and you should be aware of
+how it is changing.
+Maybe not in minute detail,
+but it&amp;rsquo;s a lot of code
+which you are shipping,
+so you should read the label.&lt;/p&gt;
+
+&lt;h2&gt;The Money Saved&lt;/h2&gt;
+
+&lt;p&gt;No one will care if you update gems
+every Monday morning
+but you are saving your company
+lots of money.&lt;/p&gt;
+
+&lt;p&gt;I asked some friends
+to estimate the cost of
+getting totally current with their gems
+at their company or clients
+and here&amp;rsquo;s what they said:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Upgrading Rails 2 to 3 is about 16+
+developer-weeks, so about a $100-200k problem&lt;/li&gt;
+&lt;li&gt;Upgrading Rails 3 to 4 is about half of that.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Assume the bigger the codebase,
+or the older it is,
+the higher the cost.&lt;/p&gt;
+
+&lt;p&gt;So no, it&amp;rsquo;s not glamorous work
+but someone should thank you for doing it.&lt;/p&gt;
+
+&lt;p&gt;Also, if you are up to date,
+others will pick up the slack for you
+&lt;em&gt;because you&amp;rsquo;ve made it so easy&lt;/em&gt;.
+Good job! You are a minor hero!&lt;/p&gt;
+
+&lt;h2&gt;Acknowledgements&lt;/h2&gt;
+
+&lt;p&gt;Big thanks to &lt;a href="https://twitter.com/drapergeek"&gt;Jason Draper&lt;/a&gt;
+for helpful edits
+and promising to argue with me about this
+in public.&lt;/p&gt;
+
+&lt;p&gt;Also, thanks to the people who
+shared estimates or anecdotes
+of what it costs to upgrade
+Gem suites.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Bundler Failing on El Capitan</title>
+    <link rel="alternate" href="http://adarsh.io/bundler-failing-on-el-capitan"/>
+    <id>http://adarsh.io/bundler-failing-on-el-capitan</id>
+    <published>2015-11-08T16:00:00-08:00</published>
+    <updated>2016-09-28T21:18:10-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;p&gt;After updating to El Capitan,
+installing new gems
+started to fail.
+It looked something like this:&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;Building native extensions.  This could take a while...
+ERROR:  Error installing awesome_gem_name:
+    ERROR: Failed to build gem native extension.
+
+checking for rb_trap_immediate in ruby.h,rubysig.h... no
+checking for rb_thread_blocking_region()... no
+...
+CFLAGS=-O3 -I/Users/haven/.sm/pkg/active/include -fPIC -mmacosx-version-min=10.7 -pipe  -Wall -Wextra -Wno-deprecated-declarations -Wno-ignored-qualifiers -Wno-unused-result
+CPPFLAGS=-D_XOPEN_SOURCE -D_DARWIN_C_SOURCE -D_DARWIN_UNLIMITED_SELECT -D_REENTRANT $(DEFS) $(cppflags) -Wall -Wextra -Wno-deprecated-declarations -Wno-ignored-qualifiers -Wno-unused-result
+checking for clock_gettime()... no
+checking for gethrtime()... no
+creating Makefile
+
+make "DESTDIR=" clean
+
+make "DESTDIR="
+compiling binder.cpp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;But here&amp;rsquo;s the important part:&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;In file included from binder.cpp:20:
+./project.h:116:10: fatal error: 'openssl/ssl.h' file not found
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;&lt;a href="https://www.youtube.com/watch?v=k5Cfhooa1bI"&gt;Wha happened?&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;As of OS X El Capitan,
+Apple no longer provides OpenSSL headers.&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;But wait, I have OpenSSL!,&amp;rdquo; you cry.&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ which openssl
+/usr/bin/openssl
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Yes you do, but you lack the &lt;a href="http://www.tutorialspoint.com/cprogramming/c_header_files.htm"&gt;C &lt;em&gt;headers&lt;/em&gt;&lt;/a&gt;
+which some gems use to build
+native extensions.&lt;/p&gt;
+
+&lt;p&gt;Think of the headers as the source code
+and &lt;code&gt;/usr/bin/openssl&lt;/code&gt; as the compiled binary.&lt;/p&gt;
+
+&lt;p&gt;Apple no longer ships the headers
+on which many gems with native C extensions depend.
+For more on why, &lt;a href="https://lists.apple.com/archives/macnetworkprog/2015/Jun/msg00025.html"&gt;read this post&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;span class="c"&gt;# On earlier OS X:&lt;/span&gt;
+&lt;span class="gp"&gt;$ &lt;/span&gt;ls /usr/include/openssl/ssl.h
+/usr/include/openssl/ssl.h
+
+&lt;span class="c"&gt;# On El Capitan:&lt;/span&gt;
+&lt;span class="gp"&gt;$ &lt;/span&gt;ls /usr/include/openssl/ssl.h
+ls: /usr/include/ssl.h: No such file or directory
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;&lt;a href="https://www.youtube.com/watch?v=yo3uxqwTxk0"&gt;Fix It!&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;You can install your own OpenSSL headers
+using either Homebrew or MacPorts.
+I&amp;rsquo;m a Homebrew guy so let&amp;rsquo;s go that route.&lt;/p&gt;
+
+&lt;p&gt;First let&amp;rsquo;s uninstall whatever you have,
+if anything:&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ brew uninstall openssl --force
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;--force&lt;/code&gt; bit will &amp;ldquo;remove out-of-date keg-only brews as well&amp;rdquo;
+(see the &lt;code&gt;man brew&lt;/code&gt; page).&lt;/p&gt;
+
+&lt;p&gt;I couldn&amp;rsquo;t get this to work
+unless I updated my
+XCode Command Line tools
+after upgrading to El Capitan.&lt;/p&gt;
+
+&lt;p&gt;So let&amp;rsquo;s do that:&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ xcode-select --install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Be sure to agree to everything,
+not just in the dialogue boxes OS X presents,
+but in life - just try to say yes more.
+(NOTE: Any philosophical disagreements
+are beyond the scope of this blog post
+and left as an exercise for the reader.)&lt;/p&gt;
+
+&lt;p&gt;When that is finished,
+then install OpenSSL
+and force symlinking
+into the appropriate places:&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ brew update
+$ brew install openssl
+$ brew link --force openssl
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now your &lt;code&gt;bundle install&lt;/code&gt; should work no problem!&lt;/p&gt;
+
+&lt;h3&gt;Acknowledgements&lt;/h3&gt;
+
+&lt;p&gt;Thanks to Gabe Berke-Williams for helpful edits.
+Read &lt;a href="http://gabebw.com/"&gt;his amazing blog&lt;/a&gt;
+or follow &lt;a href="https://twitter.com/gabebw"&gt;his pun-filled Twitter feed&lt;/a&gt;
+or investigate &lt;a href="https://github.com/gabebw"&gt;his myriad of interesting GitHub projects.&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>How to Turn Sales Leads into Awesome Paid Work</title>
+    <link rel="alternate" href="http://adarsh.io/how-to-turn-sales-leads-into-awesome-paid-work"/>
+    <id>http://adarsh.io/how-to-turn-sales-leads-into-awesome-paid-work</id>
+    <published>2015-11-03T16:00:00-08:00</published>
+    <updated>2016-09-28T21:18:10-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;p&gt;Continuing my series demystifying consulting,
+(which premiered &lt;a href="/how-to-run-a-freelance-software-consulting-business"&gt;here&lt;/a&gt;)
+I&amp;rsquo;m going to share what I know about
+closing sales leads.&lt;/p&gt;
+
+&lt;h2&gt;Caveat&lt;/h2&gt;
+
+&lt;p&gt;As previously stated,
+I am not any kind of sales guru
+or webinar purveyor.
+I&amp;rsquo;m just a guy who has experience
+finding fun freelancing work.&lt;/p&gt;
+
+&lt;p&gt;If you want to read the classics on sales,
+I honestly can&amp;rsquo;t help you - I have no idea what they are,
+but &lt;a href="http://amzn.to/1Rw38Ne"&gt;Amazon&lt;/a&gt; probably does.
+(Caution: Sales books are also selling you a book
+in addition to advice, so be careful)&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;If you haven&amp;rsquo;t already,
+check out
+&lt;a href="/how-to-run-a-freelance-software-consulting-business"&gt;my original article on how to generate sales leads here&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2&gt;Okay now I have leads&lt;/h2&gt;
+
+&lt;p&gt;Great, so you have a lead!
+Wait, what is a &amp;ldquo;lead&amp;rdquo; again?&lt;/p&gt;
+
+&lt;p&gt;It&amp;rsquo;s just a person who has showed some interest
+in working with you as a consultant.
+No one has made any promises,
+and sentences end with phrases like
+&amp;ldquo;Let&amp;rsquo;s see if we can figure this out&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Everyone is hopeful and excited (probably).
+What you do next is critical:
+You have a meeting to discuss the project.&lt;/p&gt;
+
+&lt;p&gt;You should meet in person if possible.
+Remember your goal is to build trust,
+the foundation of any good business relationship.&lt;/p&gt;
+
+&lt;p&gt;If you can&amp;rsquo;t do in-person,
+videochat to ensure they see
+you are a human with a face and feelings.&lt;/p&gt;
+
+&lt;h2&gt;The Sales Meeting&lt;/h2&gt;
+
+&lt;p&gt;This meeting is a weird one but it doesn&amp;rsquo;t have to be.
+Essentially you&amp;rsquo;re trying to say
+&amp;ldquo;Hey, I&amp;rsquo;d like for you to pay me to do stuff. I&amp;rsquo;m good at what I do.&amp;rdquo;
+and the other party is saying
+&amp;ldquo;Hey, I have no idea who you are,
+please prove to me you are good at your job
+and that you can help me solve my problem.&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;So these are your goals
+and those should be plainly stated to everyone
+RIGHT AT THE START OF THE MEETING.
+Something like:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;Hey thanks for taking this meeting,
+I appreciate your time.
+How&amp;rsquo;s this agenda sound:
+1) I get to know you and your problem/project
+2) You get to know me and what I&amp;rsquo;m good at
+3) We decide together if there is a fit between the two?&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The important message you are conveying here is
+&amp;ldquo;I have no idea if it&amp;rsquo;s a good idea to work together.
+We should discuss it and see if that is the case.&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;This totally flips people out.
+When you are in the Sales Meeting™,
+most people expect you to stretch the truth
+and be aggressive in pushing your case
+because that&amp;rsquo;s what most people do.&lt;/p&gt;
+
+&lt;p&gt;If you start with some practical honesty,
+you&amp;rsquo;ll immediately garner some trust.
+Your discussion will go a lot better
+when your lead realizes you&amp;rsquo;re not a greasy weirdo
+but just some person looking to find work.&lt;/p&gt;
+
+&lt;p&gt;One tip here:
+&lt;em&gt;You should get them to talk about their project first.&lt;/em&gt;
+You are probably good at lots of stuff
+and if you go through all of it,
+frankly, it will be boring and probably irrelevant.&lt;/p&gt;
+
+&lt;p&gt;If you get to hear the project first,
+then you can tailor what you share
+about your abilities/experience.&lt;/p&gt;
+
+&lt;p&gt;If they insist and say &amp;ldquo;no you first&amp;rdquo;,
+just tell them you want to tailor the discussion
+and not waste their time.
+If there&amp;rsquo;s one thing people love,
+it&amp;rsquo;s people not wasting their time.&lt;/p&gt;
+
+&lt;h2&gt;Have a pitch of some sort&lt;/h2&gt;
+
+&lt;p&gt;When you talk about yourself and your work,
+be prepared to show what you&amp;rsquo;ve done
+and talk about who you worked with.&lt;/p&gt;
+
+&lt;p&gt;If you&amp;rsquo;ve signed NDAs,
+you should have cleared some anonymized versions of the work
+with your previous client before this meeting.&lt;/p&gt;
+
+&lt;p&gt;You should also highlight
+how you solve problems of this type
+and talk about questions that usually come up
+when dealing with this kind of work.&lt;/p&gt;
+
+&lt;p&gt;You can do this via a portfolio,
+or manifesto,
+or &lt;a href="http://adarsh.io"&gt;blog&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;This part of you describing your work
+should be prepared, but not rehearsed.&lt;/p&gt;
+
+&lt;p&gt;You should practice it 10-15 times on friends
+before taking it out on the road for best results.&lt;/p&gt;
+
+&lt;p&gt;Also, as you repeat this pitch,
+it will evolve and improve over time.
+Pay attention to what people respond to
+and talk more about those things.&lt;/p&gt;
+
+&lt;p&gt;Last note, it should be short, say ~5 minutes.
+If there’s one thing people love, it’s people not wasting their time.&lt;/p&gt;
+
+&lt;h2&gt;Figure out if there is a fit (AKA &amp;ldquo;turn down almost all of your leads&amp;rdquo;)&lt;/h2&gt;
+
+&lt;p&gt;Okay, now you&amp;rsquo;ve heard what they need done
+and you have said something about yourself.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;At this point, you should probably turn down the work.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;In my experience,
+you should expect to politely decline about 90% of your leads.&lt;/p&gt;
+
+&lt;p&gt;Generally, you shouldn&amp;rsquo;t have to persuade people.
+If the sales process feels like a natural fit
+so will the project&amp;rsquo;s build phase.&lt;/p&gt;
+
+&lt;p&gt;What? Aren&amp;rsquo;t you trying to sell work?&lt;/p&gt;
+
+&lt;p&gt;Yes, you are, but odds are,
+it&amp;rsquo;s not a good fit for one of the below-discussed reasons.&lt;/p&gt;
+
+&lt;p&gt;But more importantly,
+the worse of a fit the project is for you,
+the worse it will go
+and the lower chance of referrals
+which means your reputation and business are sinking.&lt;/p&gt;
+
+&lt;p&gt;If you take high-quality good-fit projects,
+they will beget more of the same.
+If you take crappy death-marches,
+you&amp;rsquo;ll get more of those.&lt;/p&gt;
+
+&lt;p&gt;Okay why is it potentially not a good fit?&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;You don&amp;rsquo;t know how to do what they want&lt;/li&gt;
+&lt;li&gt;What they want done is probably the wrong way to go about it&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If it&amp;rsquo;s the former, you should say something like
+&amp;ldquo;I don&amp;rsquo;t know how to do that, sorry,&amp;rdquo; and leave.
+If you know someone else who can do the work,
+you should offer an introduction
+and thank them for making you
+a pourover coffee which took 15 minutes.&lt;/p&gt;
+
+&lt;p&gt;If you don&amp;rsquo;t know how to do it
+&lt;em&gt;but feel like you could wing it&lt;/em&gt;
+say that, but then offer a significant discount,
+like 50% off for the first few weeks.&lt;/p&gt;
+
+&lt;p&gt;If they&amp;rsquo;re going about things all wrong,
+there are two flavors:&lt;/p&gt;
+
+&lt;h3&gt;1) This is a terrible project for anyone, anywhere&lt;/h3&gt;
+
+&lt;p&gt;You need to cautiously figure out a way to share this
+without being a know-it-all. Something like&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Look, clearly you are a sharp lady and know the world of high finance well, but building a mobile app to run hair salons without any experience might be troublesome.  As I&amp;rsquo;ve seen it in my work, some domain expertise is important
+ to success in software businesses.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Be sure to explain yourself but also note that you could be totally wrong.
+Then, be nice, compliment their carpet, and leave quickly.&lt;/p&gt;
+
+&lt;h3&gt;2) This is a reasonable project but some specifics are off&lt;/h3&gt;
+
+&lt;p&gt;Maybe you feel like there&amp;rsquo;s a better way to do this?
+You should share that and say why,
+ideally sharing some experience where
+you did things your way and it turned out amazingly.&lt;/p&gt;
+
+&lt;p&gt;This is the best case situation.
+You are an expert and will probably do a much better job
+than they expected and everyone will be happy.&lt;/p&gt;
+
+&lt;p&gt;At this point, you should close the meeting
+and say &amp;ldquo;hey this sounds like it might be a fit&amp;rdquo;
+should we find some more time to go through this in detail?&amp;ldquo;&lt;/p&gt;
+
+&lt;p&gt;The second meeting will be about project specifics
+and pricing.&lt;/p&gt;
+
+&lt;h2&gt;Negotiating a Contract&lt;/h2&gt;
+
+&lt;p&gt;Again, other smarter people than me
+have written more on the subject,
+but here&amp;rsquo;s what has worked well for me:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Only work on time and materials - never fixed bid.&lt;/li&gt;
+&lt;li&gt;Set a daily or weekly rate, not an hourly one - it keeps clients from
+nitpicking how you spend your time.&lt;/li&gt;
+&lt;li&gt;Agree to invoice once a week and send them Friday evening when you wrap up for
+the day. Be very detailed in accounting for your time in the invoice. I like
+&lt;a href="https://adarshpandit.freshbooks.com/tryfreshbooks/www"&gt;FreshBooks&lt;/a&gt; for invoicing but there are lots of good/simple/free choices.&lt;/li&gt;
+&lt;li&gt;Make the contract week-to-week with an option to stop with 2 weeks notice. It
+allows the project to keep going or stop as needed.&lt;/li&gt;
+&lt;li&gt;Keep proposals and contracts generic.  Don&amp;rsquo;t specify a ton of low level
+requirements to be implemented during the project, because they will change.&lt;/li&gt;
+&lt;li&gt;Don&amp;rsquo;t sign NDA&amp;rsquo;s if possible. No idea is that amazing, it&amp;rsquo;s execution that
+matters. Also, the client won&amp;rsquo;t tell you &lt;em&gt;anything&lt;/em&gt; without an NDA, you should
+pass.&lt;/li&gt;
+&lt;li&gt;Don&amp;rsquo;t respond to RFPs. It takes forever and is usually a sign the client has
+overscoped the project.&lt;/li&gt;
+&lt;li&gt;Don&amp;rsquo;t take equity. You are not a seasoned investor. Save your cash and put it
+in an index fund.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Closing&lt;/h2&gt;
+
+&lt;p&gt;Again, without belaboring the point,
+be yourself and don&amp;rsquo;t force any agreements or partnerships.
+The more natural the sales process feels,
+the more likely you will have a good outcome,
+good referrals,
+and booming business.&lt;/p&gt;
+
+&lt;p&gt;Please be sure to invite me out on your boat for a ride.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>How to Generate Sales Leads as a Freelance Developer</title>
+    <link rel="alternate" href="http://adarsh.io/how-to-generate-sales-leads-as-a-freelance-developer"/>
+    <id>http://adarsh.io/how-to-generate-sales-leads-as-a-freelance-developer</id>
+    <published>2015-10-30T17:00:00-07:00</published>
+    <updated>2016-09-28T21:18:10-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;p&gt;As I wrote in &lt;a href="/how-to-run-a-freelance-software-consulting-business"&gt;this post&lt;/a&gt;,
+I&amp;rsquo;m sharing what I know about
+consulting in the hope it&amp;rsquo;s helpful for others.&lt;/p&gt;
+
+&lt;p&gt;This post focuses on how to generate sales leads or
+&amp;ldquo;finding people who are interested in paying you.&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;Everything here I learned as a freelance
+management consultant,
+while selling millions of dollars of work
+for a medium-sized boutique firm,
+and now as a freelance developer.&lt;/p&gt;
+
+&lt;h2&gt;Preface&lt;/h2&gt;
+
+&lt;p&gt;It&amp;rsquo;s a weird thing to hire someone else
+and pay them for their time.&lt;/p&gt;
+
+&lt;p&gt;The relationship requires trust above all else.
+Once one party loses trust in the other,
+it&amp;rsquo;s best to move on, re-evaluate what happened,
+and find other work.
+As such everything you do
+needs to be authentic, honest, and professional,
+including trying to drum up business.&lt;/p&gt;
+
+&lt;p&gt;Also it&amp;rsquo;s worth noting these tactics work best
+when you do them very consistently
+for a long time.
+There&amp;rsquo;s no substitute for building good routines
+and doing the work.&lt;/p&gt;
+
+&lt;p&gt;Finally, it should be noted
+that I am by no means perfect at sales
+and your mileage may vary.&lt;/p&gt;
+
+&lt;p&gt;Okay let&amp;rsquo;s start:&lt;/p&gt;
+
+&lt;h2&gt;Networking&lt;/h2&gt;
+
+&lt;h3&gt;Specific Tactics I Use&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Keep a list of people to stay in touch with.&lt;/li&gt;
+&lt;li&gt;Be sure to follow up regularly. Use tools to automate the process.
+I like to send a reminder to &lt;a href="http://help.followup.cc/knowledge_base/topics/cheat-sheet"&gt;&lt;code&gt;every2months@followup.cc&lt;/code&gt;&lt;/a&gt; with
+the subject line &amp;ldquo;Get Coffee With PERSON&amp;rdquo; and get reminded regularly.
+Repeating calendar invites are great for this as well.&lt;/li&gt;
+&lt;li&gt;Be Helpful 1: Make introductions on behalf of people you think might
+benefit from meeting each other.&lt;/li&gt;
+&lt;li&gt;Be Helpful 2: Forward articles/videos/tweets/etc to people if you think
+they&amp;rsquo;ll find it interesting / relevant.&lt;/li&gt;
+&lt;li&gt;Don&amp;rsquo;t spend time with people you don&amp;rsquo;t like.&lt;/li&gt;
+&lt;li&gt;Send them articles when you think they may find them interesting. &lt;a href="/google-reader-as-a-networking-tool"&gt;Here&amp;rsquo;s an
+old post where I talk about doing it with Google Reader&lt;/a&gt;, which
+tells you how old the post is.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The goal of these activities
+is to make &amp;ldquo;business friends&amp;rdquo;
+whom you like, and who like you.
+If you don&amp;rsquo;t like someone,
+or are just hanging out with them
+because you feel you have to,
+it won&amp;rsquo;t work.&lt;/p&gt;
+
+&lt;p&gt;You should be helpful to them,
+recommending candidates to hire,
+articles to read,
+people to meet,
+and services to try.&lt;/p&gt;
+
+&lt;p&gt;You should ask them for advice frequently.
+You should ask them for help rarely.
+You should support their businesses,
+retweet their product announcements,
+and support their crowdfunding campaigns,
+&lt;em&gt;but only do so because you feel like it&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;I should note
+that every job I&amp;rsquo;ve ever gotten
+has been a result of networking.
+I&amp;rsquo;m guessing this is broadly true.&lt;/p&gt;
+
+&lt;h3&gt;Why Do This&lt;/h3&gt;
+
+&lt;p&gt;First of all,
+you make business friends to learn.
+Asking questions helps you understand
+what other companies and situations are like
+which helps you handle your own thing.&lt;/p&gt;
+
+&lt;p&gt;Second of all, it feels good to help people,
+or rather it should.
+If it doesn&amp;rsquo;t,
+there&amp;rsquo;s a whole other set of problems to address.&lt;/p&gt;
+
+&lt;p&gt;But really,
+the reason you get to know a lot of people
+is to be top of mind when they need help.&lt;/p&gt;
+
+&lt;p&gt;An example is:
+Sally works at a company
+and hears
+&amp;ldquo;oh we need to get help with this Rails app,&amp;rdquo;
+and thinks
+&amp;ldquo;I wonder if my friend YOUR_NAME knows someone, or can help&amp;hellip;&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;Then they call you,
+and you have a discussion about how helpful you can be
+(if at all).
+Be sure to let them know
+if you&amp;rsquo;re the wrong person for the job
+but maybe you know who the right person is.&lt;/p&gt;
+
+&lt;p&gt;All of this should feel authentic.
+If it feels slimy or manipulative to you,
+it will seem that way to everyone,
+and you won&amp;rsquo;t build trust (see above).&lt;/p&gt;
+
+&lt;h2&gt;Content Marketing: Writing&lt;/h2&gt;
+
+&lt;h3&gt;Specific Tactics I Use&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Set up a blog which clearly states you are hirable and what skills you have.&lt;/li&gt;
+&lt;li&gt;Blog and tweet as regularly as you can about your work.
+The content should be solid, but quantity and regularity matter much more.&lt;/li&gt;
+&lt;li&gt;If you do something neat for a client, use their name (with permission).
+They may cross-promote your post for you.&lt;/li&gt;
+&lt;li&gt;Try using an editorial board in Trello to build a pipeline of ideas
+which you can push along into posts.&lt;/li&gt;
+&lt;li&gt;Set regular writing goals like one post per week, one hour a day, etc.&lt;/li&gt;
+&lt;li&gt;Promote your posts using Twitter, Google+, LinkedIn, Facebook, whatever.
+You can use &lt;a href="https://buffer.com"&gt;Buffer&lt;/a&gt; to automate this stuff.&lt;/li&gt;
+&lt;li&gt;Find a pal who is good at writing to edit your posts before going out.
+I have everything in GitHub and ask for reviews using pull requests.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Why Do This&lt;/h3&gt;
+
+&lt;p&gt;Writing blog posts is the highest leverage activity you can engage in.
+In other words,
+you can reach the most people
+per unit time of effort.&lt;/p&gt;
+
+&lt;p&gt;Also, posts last forever
+and the longer they&amp;rsquo;re around
+the more likely they are to be read.&lt;/p&gt;
+
+&lt;p&gt;Finally, your writing is representative of
+what you are like to work with.
+If it&amp;rsquo;s clear and well-edited,
+it&amp;rsquo;ll signal how you take care in your work.
+If you share interesting perspectives,
+it likely means you&amp;rsquo;ll have valuable things to say
+when someone hires you.
+If you write very regularly,
+it clearly demonstrates discipline.&lt;/p&gt;
+
+&lt;h2&gt;Content Marketing: Speaking&lt;/h2&gt;
+
+&lt;h3&gt;Specific Tactics I Use&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Write a ton of articles. Seriously, as many as you can.&lt;/li&gt;
+&lt;li&gt;Some of them will get a lot of traction. You&amp;rsquo;ll know because people will
+tweet them and maybe contact you. Analytics could help here also.&lt;/li&gt;
+&lt;li&gt;Write a 5-10 minute talk about the most popular topic.&lt;/li&gt;
+&lt;li&gt;Ask to give that talk at a meetup. Organizers are always looking for
+good technical material as long as you&amp;rsquo;re not shamelessly selling something.&lt;/li&gt;
+&lt;li&gt;Big meetups record or stream the video content.  Watch the recording to
+see how you did. Also ask others at the meeting for feedback.&lt;/li&gt;
+&lt;li&gt;Keep giving this talk. In other words, practice.&lt;/li&gt;
+&lt;li&gt;Expand the talk to something bigger.&lt;/li&gt;
+&lt;li&gt;Use the expanded talk and video as submission materials for conferences.&lt;/li&gt;
+&lt;li&gt;Go to conferences and meet all the other nice people.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Why Do This&lt;/h3&gt;
+
+&lt;p&gt;Talks help promote your articles, which in turn promote your consulting business.&lt;/p&gt;
+
+&lt;p&gt;In addition, speaking publicly makes you seem approachable and gives shy people
+a great excuse to talk to you, which is the goal - networking and making
+friends in your field of work.&lt;/p&gt;
+
+&lt;p&gt;Finally, it&amp;rsquo;s a lot of fun.&lt;/p&gt;
+
+&lt;h2&gt;Then What?&lt;/h2&gt;
+
+&lt;p&gt;How do you handle all of this crazy sales demand
+now that you are a big shot?&lt;/p&gt;
+
+&lt;p&gt;People will find a way to get in touch with you.
+You could add an interest form to your blog
+to increase the volume,
+but note that comes with a decrease in quality.&lt;/p&gt;
+
+&lt;p&gt;You may need something like a CRM
+if you&amp;rsquo;re going to run a firm
+with other people as employees.&lt;/p&gt;
+
+&lt;p&gt;If it&amp;rsquo;s just you, don&amp;rsquo;t bother.
+Use something like Trello to keep info in one place,
+and follow-up regularly with interested parties.&lt;/p&gt;
+
+&lt;p&gt;My next post will be on how to actually close these leads.&lt;/p&gt;
+
+&lt;p&gt;Thanks to &lt;a href="https://twitter.com/eignerchris"&gt;Chris Eigner&lt;/a&gt;, &lt;a href="https://twitter.com/gabebw"&gt;Gabe Berke-Williams&lt;/a&gt;, and &lt;a href="https://twitter.com/captbaritone"&gt;Jordan Eldridge&lt;/a&gt;
+for helpful edits and feedback.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Run a Profitable Business as a Freelance Developer Consultant</title>
+    <link rel="alternate" href="http://adarsh.io/how-to-run-a-freelance-software-consulting-business"/>
+    <id>http://adarsh.io/how-to-run-a-freelance-software-consulting-business</id>
+    <published>2015-10-29T17:00:00-07:00</published>
+    <updated>2016-09-28T21:18:10-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;p&gt;I have been a consultant for ten years
+in one capacity or another.
+I&amp;rsquo;ve been a technology consultant for three years
+and sold development services
+for most of that time.&lt;/p&gt;
+
+&lt;p&gt;These days, I&amp;rsquo;m a freelance developer
+writing Ruby and JavaScript
+and helping set up good development routines
+to help teams be super productive and happy.&lt;/p&gt;
+
+&lt;p&gt;Frequently, I get asked for advice
+on how to build a consulting business.
+Usually the people asking are
+developers just starting out.&lt;/p&gt;
+
+&lt;p&gt;When I share whatever I know,
+I usually ask the other person to keep me posted
+on how things turn out.
+I&amp;rsquo;m always curious to know
+if anything I&amp;rsquo;ve said was actually useful
+so I can stop boring people if when it&amp;rsquo;s not.&lt;/p&gt;
+
+&lt;p&gt;A few months ago, I spoke with someone
+starting a software consulting business with his friend.&lt;/p&gt;
+
+&lt;p&gt;Some months after we spoke,
+he wrote to let me know
+things were going well
+and they&amp;rsquo;d landed some clients.
+(I very rarely ever hear back from people later,
+so this was awesome for me!)
+Apparently, some of what I said was useful
+and fortunately for me,
+he took notes and shared them back with me.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m going to turn these notes into
+a few posts summarizing things I say a lot
+in hopes it helps someone out.&lt;/p&gt;
+
+&lt;p&gt;More importantly,
+I&amp;rsquo;m hoping sharing whatever I know
+can turn &amp;ldquo;sales&amp;rdquo; from
+something slimy and manipulative
+into clear and honest tactics
+for growing a small business.&lt;/p&gt;
+
+&lt;h3&gt;UPDATE:&lt;/h3&gt;
+
+&lt;p&gt;Here is the list of articles in the series:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="/how-to-generate-sales-leads-as-a-freelance-developer"&gt;How to Generate Sales Leads&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="/how-to-turn-sales-leads-into-awesome-paid-work"&gt;How to Turn Sales Leads into Awesome Paid Work&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Feedback is always welcome
+ and very appreciated
+&lt;a href="https://github.com/adarsh/blog"&gt;via GitHub&lt;/a&gt; or &lt;a href="https://twitter.com/adarshp"&gt;Twitter&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Thanks to &lt;a href="http://www.justinspradlin.com"&gt;Justin Spradlin&lt;/a&gt; for sharing
+notes back with me.
+If you&amp;rsquo;d like to talk to him
+about his business
+or hire him,
+try him on &lt;a href="https://twitter.com/sprad"&gt;Twitter&lt;/a&gt;.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Automate Gem Vulnerability Checks</title>
+    <link rel="alternate" href="http://adarsh.io/automatically-check-gem-vulnerabilities-in-circle-ci"/>
+    <id>http://adarsh.io/automatically-check-gem-vulnerabilities-in-circle-ci</id>
+    <published>2015-06-14T17:00:00-07:00</published>
+    <updated>2016-09-28T21:18:10-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;p&gt;Gem authors regularly report security issues
+as responsible maintainers
+of open-source software.
+Unfortunately, unless you follow
+every Github repository for every gem
+that you use, it&amp;rsquo;s hard to keep up
+with news on the dozens of gems you use.&lt;/p&gt;
+
+&lt;p&gt;Luckily, we&amp;rsquo;re programmers
+who like to write tools for programmers.&lt;/p&gt;
+
+&lt;p&gt;Enter &lt;a href="https://github.com/rubysec/bundler-audit"&gt;bundle-audit&lt;/a&gt;,
+a handy gem to check
+your &lt;code&gt;Gemfile.lock&lt;/code&gt; for reported vulnerabilities.&lt;/p&gt;
+
+&lt;p&gt;It&amp;rsquo;s easy enough to update the latest vulnerabilities
+and scan your lockfile:&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;gem install bundler-audit
+&lt;span class="gp"&gt;$ &lt;/span&gt;bundle-audit update
+&lt;span class="gp"&gt;$ &lt;/span&gt;bundle-audit check
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;but who can be bothered to remember to run this frequently?
+As developers,
+we should rely on computers
+to do routine tasks, right?&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add an automated check
+to our Continuous Integration service.
+In this case, we&amp;rsquo;re using &lt;a href="https://circleci.com"&gt;CircleCI&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note: If you&amp;rsquo;re using &lt;a href="https://travis-ci.org/"&gt;Travis&lt;/a&gt;,
+&lt;a href="https://aprescott.com/posts/bundler-audit"&gt;see Adam Prescott&amp;rsquo;s nice writeup&lt;/a&gt;
+for how to do the same there.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;First, let&amp;rsquo;s add the gem to our development and test environments:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# Gemfile&lt;/span&gt;
+&lt;span class="n"&gt;group&lt;/span&gt; &lt;span class="ss"&gt;:development&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;:test&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+  &lt;span class="n"&gt;gem&lt;/span&gt; &lt;span class="s1"&gt;'bundler-audit'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;require: &lt;/span&gt;&lt;span class="kp"&gt;false&lt;/span&gt;
+  &lt;span class="c1"&gt;# ...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now let&amp;rsquo;s add the appropriate command
+to our CircleCI build cascade:&lt;/p&gt;
+&lt;pre class="highlight yaml"&gt;&lt;code&gt;&lt;span class="na"&gt;dependencies&lt;/span&gt;&lt;span class="pi"&gt;:&lt;/span&gt;
+  &lt;span class="na"&gt;pre&lt;/span&gt;&lt;span class="pi"&gt;:&lt;/span&gt;
+    &lt;span class="pi"&gt;-&lt;/span&gt; &lt;span class="s"&gt;gem install bundler rake&lt;/span&gt;
+  &lt;span class="na"&gt;post&lt;/span&gt;&lt;span class="pi"&gt;:&lt;/span&gt;
+    &lt;span class="pi"&gt;-&lt;/span&gt; &lt;span class="s"&gt;bundle exec bundle-audit update &amp;amp;&amp;amp; bundle exec bundle-audit check&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I added this to the &amp;ldquo;dependencies&amp;rdquo; group
+since it&amp;rsquo;s related to gems,
+and ran it after everything else using &lt;code&gt;post&lt;/code&gt;
+to ensure I could run the gem executable.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it! Now the build will break
+if one of our gems is insecure.&lt;/p&gt;
+</content>
+  </entry>
+</feed>

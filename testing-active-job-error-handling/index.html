@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--[if IE]><script src='http://html5shiv.googlecode.com/svn/trunk/html5.js'></script><![endif]-->
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta content='width=device-width' name='viewport'>
+<meta content="How to write tests for ActiveJob's error handling behavior" name='description'>
+<title>Testing Active Job Error Handling</title>
+<link href='feed.xml' rel='alternate' title='RSS' type='application/rss+xml'>
+<link href="/stylesheets/all-d937b735.css" rel="stylesheet" />
+<link href='https://plus.google.com/116006351214905134217' rel='author'>
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-1322480-9', 'auto');
+  ga('send', 'pageview');
+</script>
+</head>
+<body>
+<div class='body-container'>
+<div class='header-container'>
+<h1 class='blog-title'>
+<a href="http://hotlinewebring.club/adarsh/previous" title="Yes, this is a webring">←</a>
+<a href="/">Adarsh Pandit</a>
+<a href="http://hotlinewebring.club/adarsh/next" title="Yes, this is a webring">→</a>
+</h1>
+<h2 class='blog-subtitle'>
+Software Developer
+</h2>
+
+</div>
+<div class='article-container'>
+<h3 class='article-title'>
+<a href="/testing-active-job-error-handling">Testing Active Job Error Handling</a>
+</h3>
+<h6 class='timestamp'>
+<time>May 28, 2015</time>
+<span>
+By <a href="/">Adarsh Pandit</a>
+</span>
+<span>
+in
+<a href="/categories/programming">programming</a>
+</span>
+</h6>
+<div class='content'>
+<p><a href="/using-globalid-with-alternative-primary-keys">As I wrote yesterday</a>,
+I&rsquo;m a big fan of the new ActiveJob interface
+for background jobs in Rails.</p>
+
+<p>As a dedicated Test-Driven Developer,
+I like to write tests first
+when developing features,
+including things happening in background jobs.</p>
+
+<p>I have some errors appearing in the background jobs
+where I email lots of people
+for <a href="//asyncstandup.com?utm_source=adarsh.io">AsyncStandup</a>
+(a side project using email to keep up to date with your team).</p>
+
+<p>But exceptions were not being sent to Airbrake
+and debugging was difficult.</p>
+
+<p>So I wrote a test using <a href="https://relishapp.com/rspec/rspec-mocks/v/3-2/docs/working-with-legacy-code/any-instance">RSpec&rsquo;s handy <code>allow_any_instance_of</code> stub</a>:</p>
+<pre class="highlight ruby"><code><span class="n">describe</span> <span class="no">DigestEmailJob</span><span class="p">,</span> <span class="s1">'errors'</span> <span class="k">do</span>
+  <span class="n">it</span> <span class="s1">'reports errors'</span> <span class="k">do</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="no">StandardError</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'Hey! Something went wrong!'</span><span class="p">)</span>
+    <span class="n">allow_any_instance_of</span><span class="p">(</span><span class="no">DigestEmailJob</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:perform</span><span class="p">).</span>
+      <span class="nf">and_raise</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">allow</span><span class="p">(</span><span class="no">Airbrake</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:notify</span><span class="p">)</span>
+
+    <span class="no">DigestEmailJob</span><span class="p">.</span><span class="nf">perform_now</span>
+
+    <span class="n">expect</span><span class="p">(</span><span class="no">Airbrake</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_received</span><span class="p">(</span><span class="ss">:notify</span><span class="p">).</span><span class="nf">with</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+<p>I stubbed the <code>.perform</code> method on any instance of the job class here,
+which is generally inadvisable.
+It is too broadly scoped to understand clearly what is stubbed
+and can add confusion to the tests.
+Also the RSpec maintainers <a href="https://relishapp.com/rspec/rspec-mocks/v/3-2/docs/working-with-legacy-code/any-instance">advise caution</a>:</p>
+
+<blockquote>
+<p>This feature is sometimes useful when working with legacy code, though in general we discourage its use for a number of reasons:</p>
+
+<ul>
+<li>The rspec-mocks API is designed for individual object instances, but this feature operates on entire classes of objects. As a result there are some semantically confusing edge cases. For example, in <code>expect_any_instance_of(Widget).to receive(:name).twice</code> it isn&rsquo;t clear whether each specific instance is expected to receive name twice, or if two receives total are expected. (It&rsquo;s the former.)</li>
+<li>Using this feature is often a design smell. It may be that your test is trying to do too much or that the object under test is too complex.</li>
+<li>It is the most complicated feature of rspec-mocks, and has historically received the most bug reports. (None of the core team actively use it, which doesn&rsquo;t help.)</li>
+</ul>
+</blockquote>
+
+<p>However, in this case, there isn&rsquo;t a good alternative
+to simulating a raised exception,
+so we&rsquo;ll proceed with caution.</p>
+
+<p>To make the test pass,
+I added exception handling to ActiveJob
+using the <code>rescue_from</code> handler:</p>
+<pre class="highlight ruby"><code><span class="k">class</span> <span class="nc">DigestEmailJob</span> <span class="o">&lt;</span> <span class="no">ActiveJob</span><span class="o">::</span><span class="no">Base</span>
+  <span class="k">def</span> <span class="nf">perform</span>
+    <span class="p">.</span><span class="nf">.</span><span class="p">.</span>
+  <span class="nf">end</span>
+
+  <span class="n">rescue_from</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">exception</span><span class="o">|</span>
+    <span class="no">Airbrake</span><span class="p">.</span><span class="nf">notify</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+<p>Hat tip to <a href="https://github.com/isaacseymour">Isaac Seymour</a>
+for pointing out the <code>any_instance_of</code> solution.
+See the original discussion <a href="https://github.com/gocardless/rspec-activejob/issues/15#issuecomment-106041065">here</a>.
+Thanks!</p>
+
+<p>Also check out Isaac&rsquo;s nice <a href="https://github.com/gocardless/rspec-activejob">rspec-activejob</a> matchers.</p>
+
+<div class='author'>
+<div class='pic'><img src="http://www.gravatar.com/avatar/692dad2af6224bf856e94a96049292c4.png" alt="692dad2af6224bf856e94a96049292c4" /></div>
+<div class='info'>
+<h6>Written by Adarsh Pandit</h6>
+<p>
+Read more <a href="/">posts by Adarsh</a>, and
+<a href="https://twitter.com/adarshp">follow Adarsh on Twitter</a>.
+</p>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class='footer-container'>
+<a href="../feed.xml">RSS Feed</a>
+|
+<a href="https://twitter.com/adarshp">@adarshp</a>
+
+</div>
+</div>
+</body>
+</html>
