@@ -5,10 +5,208 @@
   <id>http://adarsh.io/</id>
   <link href="http://adarsh.io/"/>
   <link href="http://adarsh.io/feed.xml" rel="self"/>
-  <updated>2015-11-15T16:00:00-08:00</updated>
+  <updated>2016-09-29T17:00:00-07:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>On Growing Great Developers</title>
+    <link rel="alternate" href="http://adarsh.io/on-growing-great-developers"/>
+    <id>http://adarsh.io/on-growing-great-developers</id>
+    <published>2016-09-29T17:00:00-07:00</published>
+    <updated>2016-09-30T11:37:02-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;h2&gt;You Can Either Steal Great Developers or Farm Them&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;To grow software development teams, you can either steal excellent developers or you can develop them internally.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Everyone tries to steal but few invest in farming new developers.  Those who do have lower salary and recruiting costs, better learning cultures, and improved diversity.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Here&amp;rsquo;s why you would set up an Apprenticeship program and how to do so.&lt;/p&gt;
+
+&lt;p&gt;If you want help setting up a program like this, &lt;a href="mailto:hi@cylinder.work?subject=Saw%20Your%20Blog%20Post!%20Can%20you%20Help%20Us%20With%20Our%20Apprenticeship%20Program?"&gt;email me&lt;/a&gt;!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="/images/apprenticeship-c2aed100.png" alt="Apprenticeship" width="640" height="428" /&gt;
+  &lt;em&gt;photo courtesy of WOCinTech (&lt;a href="wocintechchat.com"&gt;wocintechchat.com&lt;/a&gt;)&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3&gt;Why Steal&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;It&amp;rsquo;s straightforward. You have a need for help, they have skills you probably need.&lt;/li&gt;
+&lt;li&gt;You can buy your way out of the problem.&lt;/li&gt;
+&lt;li&gt;It is how everyone has hired for as long as anyone can remember.&lt;/li&gt;
+&lt;li&gt;Short-term impact. Expert developers can get ramped up quickly and help you ship much faster.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Why Farm&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Cost - Creating a developer growth pipeline is much cheaper in the long-term. Apprentices are cheaper than experienced developers and will take a salary hit for the learning opportunity.&lt;/li&gt;
+&lt;li&gt;Loyalty - Apprentices are extremely loyal and less likely to turn over. You
+took a chance on them and they will always remember.&lt;/li&gt;
+&lt;li&gt;Diversity - The experienced developer pool is very homogeneous. The junior pool
+is not. If you can turn juniors into seniors, diversity will improve.&lt;/li&gt;
+&lt;li&gt;Vibe - Apprentices add a lot to company culture. Senior devs love to teach and
+coach, so give them a chance to do so. Also, Apprentices have an energy and
+optimism the old folks may have lost over the years.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Personal Backstory&lt;/h2&gt;
+
+&lt;p&gt;Back in 2012, as I tried to break into the software industry as a developer,
+I got a break.
+That break was &lt;a href="http://www.apprentice.io?utm_source=adarsh.io&amp;amp;utm_medium=blog"&gt;an apprenticeship at a local development consulting firm&lt;/a&gt;.
+I&amp;rsquo;m still not clear how I got it, but it was amazing.&lt;/p&gt;
+
+&lt;p&gt;I made $100/day and worked 8 hours shadowing a developer consultant at a client.
+In the evenings, I would stay up late Googling terms
+I didn&amp;rsquo;t understand during the day and practicing new techniques on toy apps.
+It&amp;rsquo;s made all the difference to my career and I&amp;rsquo;m thankful every day for the
+shot.&lt;/p&gt;
+
+&lt;p&gt;After getting hired as a full-timer (and later, serving as manager),
+I had a chance to interview candidates and see which ones succeeded.&lt;/p&gt;
+
+&lt;p&gt;This is what I&amp;rsquo;ve learned about how to successfully run an apprenticeship program.&lt;/p&gt;
+
+&lt;h2&gt;What is a Apprentice?&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A junior developer with &lt;em&gt;some&lt;/em&gt; experience. You will pay this person and train
+them for a few months with the goal of hiring them as full-time employees.&lt;/li&gt;
+&lt;li&gt;They should be able to write and deploy working software, however simple the
+app is or rough the code is.&lt;/li&gt;
+&lt;li&gt;Boot camp grads are usually a good fit. As of this writing, I recommend
+&lt;a href="https://www.turing.io?utm_source=adarsh.io&amp;amp;utm_medium=blog"&gt;Turing School&lt;/a&gt; or &lt;a href="https://devbootcamp.com?utm_source=adarsh.io&amp;amp;utm_medium=blog"&gt;DevBootCamp&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Everyone from fresh college grads to mid-career switchers are great
+candidates.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;How do I Interview Them?&lt;/h2&gt;
+
+&lt;h3&gt;Use the same interview process as your full-timers&lt;/h3&gt;
+
+&lt;p&gt;Give them the same questions/challenges as your full-timers
+but evaluate their responses with this lens:&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;If I coach this person for 3 months,
+would their answer meet our expectations for a full-time junior developer?&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;This involves a bit of imagination of what someone&amp;rsquo;s learning vs. time slope
+is before you get to work with them.&lt;/p&gt;
+
+&lt;h3&gt;What the Heck is a Learning vs. Time Slope?&lt;/h3&gt;
+
+&lt;p&gt;Through experience, I have discovered that each person has an internal rate of
+learning.
+That is, people can accumulate and apply new concepts at a consistent rate.
+Imagine it looks like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="/images/skill_vs_time-1cac86c0.png" alt="Skill_vs_time" width="658" height="403" /&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;For any given candidate their slope will remain constant over time,
+given ongoing support. (AKA &amp;ldquo;Pandit&amp;rsquo;s Postulate&amp;rdquo;)&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;You can use this imaginary non-quantifiable slope to both judge if they are good
+apprenticeship candidates, and later, if they would be good full-time hires.&lt;/p&gt;
+
+&lt;p&gt;The trick here is to use an interview to figure out what the candidate&amp;rsquo;s slope
+is. Good ol&amp;rsquo; &lt;code&gt;y = mx + b&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;How do you do that? Well, you get two data points, somehow, and solve for &lt;code&gt;m&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;You can look at their public code samples noting the dates, and watch
+progression. You can also see if their toy applications increase in complexity
+over time.&lt;/p&gt;
+
+&lt;p&gt;But these are guesses. You can also run an experiment to get the data.&lt;/p&gt;
+
+&lt;h3&gt;A Hiring Case Study&lt;/h3&gt;
+
+&lt;p&gt;Once upon a time, a designer applied to work with our team.
+She was very skilled as a visual designer, working mostly in print/media
+at ad agencies.
+She was also professional, proactive, and the team really liked her.&lt;/p&gt;
+
+&lt;p&gt;The role I was hiring for required front-end skills, which she did not have.
+I gave her some homework saying something like
+&amp;ldquo;See if you can rebuild your portfolio site using these tools and deploy to
+GitHub Pages or Heroku.&amp;rdquo; I gave this homework to lots of non-coding applicants.&lt;/p&gt;
+
+&lt;p&gt;She was the only one to ever respond, and just four weeks later.
+Now I had two data points: &lt;code&gt;(0,0)&lt;/code&gt; and
+&lt;code&gt;(4 weeks, learn enough front-end to make a portfolio site)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Solving for a non-numerical &lt;code&gt;m&lt;/code&gt; value,
+I guessed she would be ready for full-time work in 3 months.
+Turns out, it was 4 months, but her slope kept constant (or improved!). So as a
+result, I got a top-notch teammate and culture for a pretty small investment.&lt;/p&gt;
+
+&lt;h2&gt;Tactics for Starting Your Apprenticeship Program&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Put up a separate landing page which feeds into your full-time hiring
+pipeline. Run ads against it or blog/tweet about it.&lt;/li&gt;
+&lt;li&gt;Select for humility &lt;em&gt;and&lt;/em&gt; confidence. You want candidates are willing to take a
+step back to learn, regardless of their past work history or accomplishments.&lt;/li&gt;
+&lt;li&gt;Only take candidates excited about the apprenticeship opportunity. Focus on
+people who want to learn/grow. Otherwise you&amp;rsquo;re selling something to a
+reluctant buyer.&lt;/li&gt;
+&lt;li&gt;Respond quickly to applicants! You should do this for other candidates also.
+Just sayin&amp;rsquo;.&lt;/li&gt;
+&lt;li&gt;Develop and document how to screen and mentor apprentices.&lt;/li&gt;
+&lt;li&gt;Turn down almost all of your candidates at first, to get a feel for who is out there.&lt;/li&gt;
+&lt;li&gt;Be very clear about it being an apprenticeship. Apprentices may not get a job
+at the end, and they&amp;rsquo;ll have to work for it. Be clear about that.&lt;/li&gt;
+&lt;li&gt;Set a decision point at the end of two months when you make full-time offers.
+This gives the candidate time to look for another job.&lt;/li&gt;
+&lt;li&gt;Don&amp;rsquo;t have too many apprentices at once. Maybe a ratio of 1:10 or 1:20.&lt;/li&gt;
+&lt;li&gt;Also, before you even start the program, you should have a few mentors who are
+very excited about the program, otherwise you&amp;rsquo;re forcing something on the team
+which they may resent.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Other Notes&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Have retrospectives with everyone (Candidates, Apprentices, Mentors, Everyone
+Else) as you go.&lt;/li&gt;
+&lt;li&gt;Frequently iterate based on the feedback.
+Your success metric should be &amp;ldquo;number of great full-time hires made out of the
+program.&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;Make sure candidates get the same experience they&amp;rsquo;d get on the job.
+This helps you evaluate the candidate and helps them evaluate you as an
+employer.&lt;/li&gt;
+&lt;li&gt;Try to have more than one participant at a time.
+This camraderie is helpful support for a pretty stressful job experience.&lt;/li&gt;
+&lt;li&gt;Allow candidate to set up their own success criteria
+and use it to keep them accountable and measure how they&amp;rsquo;re doing.&lt;/li&gt;
+&lt;li&gt;Any learning the candidate does should be shared back with the mentor, maybe
+in a weekly check-in.&lt;/li&gt;
+&lt;li&gt;Encourage candidates to network, go to meet ups, etc. Community is part of the job.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Shameless Plug&lt;/h2&gt;
+
+&lt;p&gt;Do you want help setting up a program like this?
+&lt;a href="mailto:hi@cylinder.work?subject=Saw%20Your%20Blog%20Post!%20Can%20you%20Help%20Us%20With%20Our%20Apprenticeship%20Program?"&gt;Email me&lt;/a&gt;!&lt;/p&gt;
+
+&lt;h2&gt;Acknowledgements and Further Resources&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Thanks to &lt;a href="https://twitter.com/phonepoem"&gt;Jeremy Morony&lt;/a&gt;, who shared his notes with me after we discussed
+&lt;a href="http://www.carbonfive.com/careers/developer-apprentice?utm_source=adarsh.io&amp;amp;utm_medium=blog"&gt;Carbon Five&amp;rsquo;s Apprenticeship Program&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Lillie Chilen&amp;rsquo;s &lt;a href="https://www.youtube.com/watch?v=75LK0MOvyjQ"&gt;great talk from RailsConf&lt;/a&gt; on
+how to run an apprenticeship program.&lt;/li&gt;
+&lt;li&gt;Thanks to &lt;a href="https://twitter.com/captbaritone"&gt;Jordan Eldridge&lt;/a&gt; and &lt;a href="https://twitter.com/gabebw"&gt;Gabe Berke-Williams&lt;/a&gt; for helpful
+feedback and questions.&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+  </entry>
   <entry>
     <title>Save Money and Be Happier by Updating Your Gems Every Monday Morning</title>
     <link rel="alternate" href="http://adarsh.io/save-money-and-be-happier-by-updating-your-gems-every-monday-morning"/>
@@ -921,72 +1119,6 @@ If you&amp;rsquo;d like to talk to him
 about his business
 or hire him,
 try him on &lt;a href="https://twitter.com/sprad"&gt;Twitter&lt;/a&gt;.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Automate Gem Vulnerability Checks</title>
-    <link rel="alternate" href="http://adarsh.io/automatically-check-gem-vulnerabilities-in-circle-ci"/>
-    <id>http://adarsh.io/automatically-check-gem-vulnerabilities-in-circle-ci</id>
-    <published>2015-06-14T17:00:00-07:00</published>
-    <updated>2016-09-28T21:43:11-07:00</updated>
-    <author>
-      <name>Adarsh Pandit</name>
-    </author>
-    <content type="html">&lt;p&gt;Gem authors regularly report security issues
-as responsible maintainers
-of open-source software.
-Unfortunately, unless you follow
-every Github repository for every gem
-that you use, it&amp;rsquo;s hard to keep up
-with news on the dozens of gems you use.&lt;/p&gt;
-
-&lt;p&gt;Luckily, we&amp;rsquo;re programmers
-who like to write tools for programmers.&lt;/p&gt;
-
-&lt;p&gt;Enter &lt;a href="https://github.com/rubysec/bundler-audit"&gt;bundle-audit&lt;/a&gt;,
-a handy gem to check
-your &lt;code&gt;Gemfile.lock&lt;/code&gt; for reported vulnerabilities.&lt;/p&gt;
-
-&lt;p&gt;It&amp;rsquo;s easy enough to update the latest vulnerabilities
-and scan your lockfile:&lt;/p&gt;
-&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;gem install bundler-audit
-&lt;span class="gp"&gt;$ &lt;/span&gt;bundle-audit update
-&lt;span class="gp"&gt;$ &lt;/span&gt;bundle-audit check
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;but who can be bothered to remember to run this frequently?
-As developers,
-we should rely on computers
-to do routine tasks, right?&lt;/p&gt;
-
-&lt;p&gt;Let&amp;rsquo;s add an automated check
-to our Continuous Integration service.
-In this case, we&amp;rsquo;re using &lt;a href="https://circleci.com"&gt;CircleCI&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Note: If you&amp;rsquo;re using &lt;a href="https://travis-ci.org/"&gt;Travis&lt;/a&gt;,
-&lt;a href="https://aprescott.com/posts/bundler-audit"&gt;see Adam Prescott&amp;rsquo;s nice writeup&lt;/a&gt;
-for how to do the same there.&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;First, let&amp;rsquo;s add the gem to our development and test environments:&lt;/p&gt;
-&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# Gemfile&lt;/span&gt;
-&lt;span class="n"&gt;group&lt;/span&gt; &lt;span class="ss"&gt;:development&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;:test&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-  &lt;span class="n"&gt;gem&lt;/span&gt; &lt;span class="s1"&gt;'bundler-audit'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;require: &lt;/span&gt;&lt;span class="kp"&gt;false&lt;/span&gt;
-  &lt;span class="c1"&gt;# ...&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now let&amp;rsquo;s add the appropriate command
-to our CircleCI build cascade:&lt;/p&gt;
-&lt;pre class="highlight yaml"&gt;&lt;code&gt;&lt;span class="na"&gt;dependencies&lt;/span&gt;&lt;span class="pi"&gt;:&lt;/span&gt;
-  &lt;span class="na"&gt;pre&lt;/span&gt;&lt;span class="pi"&gt;:&lt;/span&gt;
-    &lt;span class="pi"&gt;-&lt;/span&gt; &lt;span class="s"&gt;gem install bundler rake&lt;/span&gt;
-  &lt;span class="na"&gt;post&lt;/span&gt;&lt;span class="pi"&gt;:&lt;/span&gt;
-    &lt;span class="pi"&gt;-&lt;/span&gt; &lt;span class="s"&gt;bundle exec bundle-audit update &amp;amp;&amp;amp; bundle exec bundle-audit check&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;I added this to the &amp;ldquo;dependencies&amp;rdquo; group
-since it&amp;rsquo;s related to gems,
-and ran it after everything else using &lt;code&gt;post&lt;/code&gt;
-to ensure I could run the gem executable.&lt;/p&gt;
-
-&lt;p&gt;That&amp;rsquo;s it! Now the build will break
-if one of our gems is insecure.&lt;/p&gt;
 </content>
   </entry>
 </feed>
