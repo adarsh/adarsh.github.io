@@ -91,20 +91,8 @@ used to look like this:</p>
 
 <p>Keen readers will note
 we are actually instantiating an instance variable here.
-That means we can access it from outside the class
-(assuming it&rsquo;s public):</p>
-<pre class="highlight ruby"><code><span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">001</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="k">def</span> <span class="nf">method_name</span><span class="p">;</span> <span class="vi">@ivar</span> <span class="o">||=</span> <span class="mi">207</span><span class="p">;</span> <span class="k">end</span>
-<span class="ss">:method_name</span>
-<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">002</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="vi">@ivar</span>
-<span class="kp">nil</span>
-<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">003</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">method_name</span>
-<span class="mi">207</span>
-<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">003</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="vi">@ivar</span>
-<span class="mi">207</span>
-</code></pre>
-<p>This is inadvertently adding to the class&rsquo;s public API.
-We should avoid this because we want to keep the
-API surface area minimal, to the extent possible.</p>
+That means we can access it from other instance methods.
+Not a huge deal, but it&rsquo;s intended for internal use when memoizing.</p>
 
 <p>Enter the underscore.</p>
 
@@ -122,6 +110,33 @@ saying &ldquo;Hey! Don&rsquo;t use this!&rdquo;.</p>
 </code></pre>
 <p>This is, of course, a style preference with no functional impact.
 It&rsquo;s also <a href="http://i.giphy.com/F3G8ymQkOkbII.gif">just my opinion, man</a>.</p>
+
+<h2>Instance Variables in Controllers</h2>
+
+<p>Also, as my friend <a href="https://twitter.com/gabebw">Gabe</a> <a href="https://github.com/adarsh/blog/pull/61#issuecomment-253646457">pointed out to me</a>,
+it&rsquo;s even more important to use an underscore
+when memoizing in Rails controllers:</p>
+
+<blockquote>
+<p>&ldquo;Since all controller ivars are available in the view,
+it&rsquo;s often helpful to mark ivars that should only be used
+in the controller with a leading underscore.
+That also allows things like this,
+where <code>@users</code> is exposed to the view and <code>@_users</code> is just used for
+memoization:&rdquo;</p>
+<pre class="highlight ruby"><code><span class="k">def</span> <span class="nf">index</span>
+  <span class="vi">@posts</span> <span class="o">=</span> <span class="n">posts</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">user: </span><span class="n">users</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">has_post: </span><span class="kp">true</span><span class="p">))</span>
+  <span class="vi">@users</span> <span class="o">=</span> <span class="n">users</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">confirmed: </span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="kp">private</span>
+
+<span class="k">def</span> <span class="nf">users</span>
+  <span class="vi">@_users</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">all</span>
+<span class="k">end</span>
+</code></pre></blockquote>
+
+<p>It&rsquo;s good to have smart friends.</p>
 
 <h2>Further Reading</h2>
 

@@ -14,7 +14,7 @@
     <link rel="alternate" href="http://adarsh.io/use-an-underscore-when-memoizing-in-ruby"/>
     <id>http://adarsh.io/use-an-underscore-when-memoizing-in-ruby</id>
     <published>2016-10-11T17:00:00-07:00</published>
-    <updated>2016-10-13T12:31:23-07:00</updated>
+    <updated>2016-10-13T16:10:36-07:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -60,20 +60,8 @@ used to look like this:&lt;/p&gt;
 
 &lt;p&gt;Keen readers will note
 we are actually instantiating an instance variable here.
-That means we can access it from outside the class
-(assuming it&amp;rsquo;s public):&lt;/p&gt;
-&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;001&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;method_name&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="vi"&gt;@ivar&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="mi"&gt;207&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="ss"&gt;:method_name&lt;/span&gt;
-&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;002&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="vi"&gt;@ivar&lt;/span&gt;
-&lt;span class="kp"&gt;nil&lt;/span&gt;
-&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;003&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;method_name&lt;/span&gt;
-&lt;span class="mi"&gt;207&lt;/span&gt;
-&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;003&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="vi"&gt;@ivar&lt;/span&gt;
-&lt;span class="mi"&gt;207&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This is inadvertently adding to the class&amp;rsquo;s public API.
-We should avoid this because we want to keep the
-API surface area minimal, to the extent possible.&lt;/p&gt;
+That means we can access it from other instance methods.
+Not a huge deal, but it&amp;rsquo;s intended for internal use when memoizing.&lt;/p&gt;
 
 &lt;p&gt;Enter the underscore.&lt;/p&gt;
 
@@ -91,6 +79,33 @@ saying &amp;ldquo;Hey! Don&amp;rsquo;t use this!&amp;rdquo;.&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This is, of course, a style preference with no functional impact.
 It&amp;rsquo;s also &lt;a href="http://i.giphy.com/F3G8ymQkOkbII.gif"&gt;just my opinion, man&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Instance Variables in Controllers&lt;/h2&gt;
+
+&lt;p&gt;Also, as my friend &lt;a href="https://twitter.com/gabebw"&gt;Gabe&lt;/a&gt; &lt;a href="https://github.com/adarsh/blog/pull/61#issuecomment-253646457"&gt;pointed out to me&lt;/a&gt;,
+it&amp;rsquo;s even more important to use an underscore
+when memoizing in Rails controllers:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;Since all controller ivars are available in the view,
+it&amp;rsquo;s often helpful to mark ivars that should only be used
+in the controller with a leading underscore.
+That also allows things like this,
+where &lt;code&gt;@users&lt;/code&gt; is exposed to the view and &lt;code&gt;@_users&lt;/code&gt; is just used for
+memoization:&amp;rdquo;&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;index&lt;/span&gt;
+  &lt;span class="vi"&gt;@posts&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;posts&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;user: &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;has_post: &lt;/span&gt;&lt;span class="kp"&gt;true&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+  &lt;span class="vi"&gt;@users&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;confirmed: &lt;/span&gt;&lt;span class="kp"&gt;true&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="kp"&gt;private&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;users&lt;/span&gt;
+  &lt;span class="vi"&gt;@_users&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;User&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;all&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;It&amp;rsquo;s good to have smart friends.&lt;/p&gt;
 
 &lt;h2&gt;Further Reading&lt;/h2&gt;
 
