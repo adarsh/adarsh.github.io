@@ -5,16 +5,112 @@
   <id>http://adarsh.io/</id>
   <link href="http://adarsh.io/"/>
   <link href="http://adarsh.io/feed.xml" rel="self"/>
-  <updated>2016-09-29T17:00:00-07:00</updated>
+  <updated>2016-10-11T17:00:00-07:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Use an Underscore When Memoizing in Ruby</title>
+    <link rel="alternate" href="http://adarsh.io/use-an-underscore-when-memoizing-in-ruby"/>
+    <id>http://adarsh.io/use-an-underscore-when-memoizing-in-ruby</id>
+    <published>2016-10-11T17:00:00-07:00</published>
+    <updated>2016-10-13T12:31:23-07:00</updated>
+    <author>
+      <name>Adarsh Pandit</name>
+    </author>
+    <content type="html">&lt;h2&gt;TLDR;&lt;/h2&gt;
+
+&lt;p&gt;Do this:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;expensive_method&lt;/span&gt;
+  &lt;span class="vi"&gt;@_expensive_method&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="c1"&gt;#something&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Not this:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;expensive_method&lt;/span&gt;
+  &lt;span class="vi"&gt;@expensive_method&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="c1"&gt;#something&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src="/images/memo_pad-9e03d548.png" alt="Memo_pad" width="800" height="600" /&gt;&lt;/p&gt;
+
+&lt;h2&gt;Memoization Basics&lt;/h2&gt;
+
+&lt;p&gt;The act of &amp;ldquo;memoizing&amp;rdquo; a method means to
+locally cache the result of an expensive operation
+on the first method invocation
+and reusing it thereafter.&lt;/p&gt;
+
+&lt;p&gt;It is functionally equivalent to:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;expensive_method&lt;/span&gt;
+  &lt;span class="vi"&gt;@expensive_method&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="vi"&gt;@expensive_method&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="n"&gt;this_expensive_operation&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Naming&lt;/h2&gt;
+
+&lt;p&gt;By convention,
+you typically see developers name the instance variable after the method.
+Likely, this is because manual instance variable accessors
+used to look like this:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;expensive_method&lt;/span&gt;
+  &lt;span class="vi"&gt;@expensive_method&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Nowadays, we usually write &lt;code&gt;attr_reader :expensive_method&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Unused Variables&lt;/h2&gt;
+
+&lt;p&gt;Keen readers will note
+we are actually instantiating an instance variable here.
+That means we can access it from outside the class
+(assuming it&amp;rsquo;s public):&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;001&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;method_name&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="vi"&gt;@ivar&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="mi"&gt;207&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="ss"&gt;:method_name&lt;/span&gt;
+&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;002&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="vi"&gt;@ivar&lt;/span&gt;
+&lt;span class="kp"&gt;nil&lt;/span&gt;
+&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;003&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;method_name&lt;/span&gt;
+&lt;span class="mi"&gt;207&lt;/span&gt;
+&lt;span class="n"&gt;irb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="mo"&gt;003&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="vi"&gt;@ivar&lt;/span&gt;
+&lt;span class="mi"&gt;207&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is inadvertently adding to the class&amp;rsquo;s public API.
+We should avoid this because we want to keep the
+API surface area minimal, to the extent possible.&lt;/p&gt;
+
+&lt;p&gt;Enter the underscore.&lt;/p&gt;
+
+&lt;p&gt;It is convention &lt;a href="http://lua-users.org/wiki/LuaStyleGuide"&gt;in&lt;/a&gt; &lt;a href="https://stackoverflow.com/questions/5893163/what-is-the-purpose-of-the-single-underscore-variable-in-python"&gt;many&lt;/a&gt; &lt;a href="https://prime.haskell.org/wiki/Underscore"&gt;languages&lt;/a&gt; &lt;a href="https://github.com/bbatsov/ruby-style-guide/#syntax"&gt;including Ruby&lt;/a&gt;
+to prepend an unused variable name
+with an underscore.&lt;/p&gt;
+
+&lt;p&gt;The underscore serves as a signal to other developers
+saying &amp;ldquo;Hey! Don&amp;rsquo;t use this!&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;We should do the same when memoizing:&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;expensive_method&lt;/span&gt;
+  &lt;span class="vi"&gt;@_expensive_method&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="c1"&gt;#something&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is, of course, a style preference with no functional impact.
+It&amp;rsquo;s also &lt;a href="http://i.giphy.com/F3G8ymQkOkbII.gif"&gt;just my opinion, man&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Further Reading&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Justin Weiss has &lt;a href="http://www.justinweiss.com/articles/4-simple-memoization-patterns-in-ruby-and-one-gem?utm_source=adarsh.io&amp;amp;utm_medium=blog"&gt;a nice article on Memoization&lt;/a&gt;
+including links to the history in Rails, handling nil results, and more.&lt;/li&gt;
+&lt;li&gt;Vaidehi Joshi &lt;a href="https://vaidehijoshi.github.io/blog/2015/11/10/methods-to-remember-things-by-ruby-memoization?utm_source=adarsh.io&amp;amp;utm_medium=blog"&gt;has a nice bit on the history of memoization itself&lt;/a&gt;.
+She writes about how it dates back to 1968. (!)&lt;/li&gt;
+&lt;li&gt;Gavin Miller wrote &lt;a href="http://gavinmiller.io/2013/basics-of-ruby-memoization?utm_source=adarsh.io&amp;amp;utm_medium=blog"&gt;a great article&lt;/a&gt; covering when to memoize and when not
+to.&lt;/li&gt;
+&lt;li&gt;Some gems which make this easier: &lt;a href="https://github.com/matthewrudy/memoist"&gt;memoist&lt;/a&gt;, &lt;a href="https://github.com/adamcooke/memist"&gt;memist&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+  </entry>
   <entry>
     <title>On Growing Great Developers</title>
     <link rel="alternate" href="http://adarsh.io/on-growing-great-developers"/>
     <id>http://adarsh.io/on-growing-great-developers</id>
     <published>2016-09-29T17:00:00-07:00</published>
-    <updated>2016-09-30T11:42:09-07:00</updated>
+    <updated>2016-09-30T20:10:14-07:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -212,7 +308,7 @@ feedback and questions.&lt;/li&gt;
     <link rel="alternate" href="http://adarsh.io/save-money-and-be-happier-by-updating-your-gems-every-monday-morning"/>
     <id>http://adarsh.io/save-money-and-be-happier-by-updating-your-gems-every-monday-morning</id>
     <published>2015-11-15T16:00:00-08:00</published>
-    <updated>2016-09-28T21:43:11-07:00</updated>
+    <updated>2016-09-30T20:10:14-07:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -454,7 +550,7 @@ Gem suites.&lt;/p&gt;
     <link rel="alternate" href="http://adarsh.io/bundler-failing-on-el-capitan"/>
     <id>http://adarsh.io/bundler-failing-on-el-capitan</id>
     <published>2015-11-08T16:00:00-08:00</published>
-    <updated>2016-09-28T21:43:11-07:00</updated>
+    <updated>2016-09-30T20:10:14-07:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -562,7 +658,7 @@ or investigate &lt;a href="https://github.com/gabebw"&gt;his myriad of interesti
     <link rel="alternate" href="http://adarsh.io/how-to-turn-sales-leads-into-awesome-paid-work"/>
     <id>http://adarsh.io/how-to-turn-sales-leads-into-awesome-paid-work</id>
     <published>2015-11-03T16:00:00-08:00</published>
-    <updated>2016-09-28T21:43:11-07:00</updated>
+    <updated>2016-09-30T20:10:14-07:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -827,7 +923,7 @@ and booming business.&lt;/p&gt;
     <link rel="alternate" href="http://adarsh.io/how-to-generate-sales-leads-as-a-freelance-developer"/>
     <id>http://adarsh.io/how-to-generate-sales-leads-as-a-freelance-developer</id>
     <published>2015-10-30T17:00:00-07:00</published>
-    <updated>2016-09-28T21:43:11-07:00</updated>
+    <updated>2016-09-30T20:10:14-07:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -1042,83 +1138,6 @@ and follow-up regularly with interested parties.&lt;/p&gt;
 
 &lt;p&gt;Thanks to &lt;a href="https://twitter.com/eignerchris"&gt;Chris Eigner&lt;/a&gt;, &lt;a href="https://twitter.com/gabebw"&gt;Gabe Berke-Williams&lt;/a&gt;, and &lt;a href="https://twitter.com/captbaritone"&gt;Jordan Eldridge&lt;/a&gt;
 for helpful edits and feedback.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Run a Profitable Business as a Freelance Developer Consultant</title>
-    <link rel="alternate" href="http://adarsh.io/how-to-run-a-freelance-software-consulting-business"/>
-    <id>http://adarsh.io/how-to-run-a-freelance-software-consulting-business</id>
-    <published>2015-10-29T17:00:00-07:00</published>
-    <updated>2016-09-28T21:43:11-07:00</updated>
-    <author>
-      <name>Adarsh Pandit</name>
-    </author>
-    <content type="html">&lt;p&gt;I have been a consultant for ten years
-in one capacity or another.
-I&amp;rsquo;ve been a technology consultant for three years
-and sold development services
-for most of that time.&lt;/p&gt;
-
-&lt;p&gt;These days, I&amp;rsquo;m a freelance developer
-writing Ruby and JavaScript
-and helping set up good development routines
-to help teams be super productive and happy.&lt;/p&gt;
-
-&lt;p&gt;Frequently, I get asked for advice
-on how to build a consulting business.
-Usually the people asking are
-developers just starting out.&lt;/p&gt;
-
-&lt;p&gt;When I share whatever I know,
-I usually ask the other person to keep me posted
-on how things turn out.
-I&amp;rsquo;m always curious to know
-if anything I&amp;rsquo;ve said was actually useful
-so I can stop boring people if when it&amp;rsquo;s not.&lt;/p&gt;
-
-&lt;p&gt;A few months ago, I spoke with someone
-starting a software consulting business with his friend.&lt;/p&gt;
-
-&lt;p&gt;Some months after we spoke,
-he wrote to let me know
-things were going well
-and they&amp;rsquo;d landed some clients.
-(I very rarely ever hear back from people later,
-so this was awesome for me!)
-Apparently, some of what I said was useful
-and fortunately for me,
-he took notes and shared them back with me.&lt;/p&gt;
-
-&lt;p&gt;I&amp;rsquo;m going to turn these notes into
-a few posts summarizing things I say a lot
-in hopes it helps someone out.&lt;/p&gt;
-
-&lt;p&gt;More importantly,
-I&amp;rsquo;m hoping sharing whatever I know
-can turn &amp;ldquo;sales&amp;rdquo; from
-something slimy and manipulative
-into clear and honest tactics
-for growing a small business.&lt;/p&gt;
-
-&lt;h3&gt;UPDATE:&lt;/h3&gt;
-
-&lt;p&gt;Here is the list of articles in the series:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="/how-to-generate-sales-leads-as-a-freelance-developer"&gt;How to Generate Sales Leads&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;a href="/how-to-turn-sales-leads-into-awesome-paid-work"&gt;How to Turn Sales Leads into Awesome Paid Work&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Feedback is always welcome
- and very appreciated
-&lt;a href="https://github.com/adarsh/blog"&gt;via GitHub&lt;/a&gt; or &lt;a href="https://twitter.com/adarshp"&gt;Twitter&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Thanks to &lt;a href="http://www.justinspradlin.com"&gt;Justin Spradlin&lt;/a&gt; for sharing
-notes back with me.
-If you&amp;rsquo;d like to talk to him
-about his business
-or hire him,
-try him on &lt;a href="https://twitter.com/sprad"&gt;Twitter&lt;/a&gt;.&lt;/p&gt;
 </content>
   </entry>
 </feed>
