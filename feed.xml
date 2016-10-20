@@ -5,7 +5,7 @@
   <id>http://adarsh.io/</id>
   <link href="http://adarsh.io/"/>
   <link href="http://adarsh.io/feed.xml" rel="self"/>
-  <updated>2016-10-11T17:00:00-07:00</updated>
+  <updated>2016-10-11T20:00:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
@@ -13,8 +13,8 @@
     <title>Use an Underscore When Memoizing in Ruby</title>
     <link rel="alternate" href="http://adarsh.io/use-an-underscore-when-memoizing-in-ruby"/>
     <id>http://adarsh.io/use-an-underscore-when-memoizing-in-ruby</id>
-    <published>2016-10-11T17:00:00-07:00</published>
-    <updated>2016-10-13T16:10:36-07:00</updated>
+    <published>2016-10-11T20:00:00-04:00</published>
+    <updated>2016-10-20T19:15:12-04:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -101,7 +101,7 @@ memoization:&amp;rdquo;&lt;/p&gt;
 &lt;span class="kp"&gt;private&lt;/span&gt;
 
 &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;users&lt;/span&gt;
-  &lt;span class="vi"&gt;@_users&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;User&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;all&lt;/span&gt;
+  &lt;span class="vi"&gt;@_users&lt;/span&gt; &lt;span class="o"&gt;||=&lt;/span&gt; &lt;span class="no"&gt;User&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;all&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/blockquote&gt;
 
@@ -124,8 +124,8 @@ to.&lt;/li&gt;
     <title>On Growing Great Developers</title>
     <link rel="alternate" href="http://adarsh.io/on-growing-great-developers"/>
     <id>http://adarsh.io/on-growing-great-developers</id>
-    <published>2016-09-29T17:00:00-07:00</published>
-    <updated>2016-09-30T20:10:14-07:00</updated>
+    <published>2016-09-29T20:00:00-04:00</published>
+    <updated>2016-09-30T23:10:14-04:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -322,8 +322,8 @@ feedback and questions.&lt;/li&gt;
     <title>Save Money and Be Happier by Updating Your Gems Every Monday Morning</title>
     <link rel="alternate" href="http://adarsh.io/save-money-and-be-happier-by-updating-your-gems-every-monday-morning"/>
     <id>http://adarsh.io/save-money-and-be-happier-by-updating-your-gems-every-monday-morning</id>
-    <published>2015-11-15T16:00:00-08:00</published>
-    <updated>2016-09-30T20:10:14-07:00</updated>
+    <published>2015-11-15T19:00:00-05:00</published>
+    <updated>2016-09-30T23:10:14-04:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -564,8 +564,8 @@ Gem suites.&lt;/p&gt;
     <title>Bundler Failing on El Capitan</title>
     <link rel="alternate" href="http://adarsh.io/bundler-failing-on-el-capitan"/>
     <id>http://adarsh.io/bundler-failing-on-el-capitan</id>
-    <published>2015-11-08T16:00:00-08:00</published>
-    <updated>2016-09-30T20:10:14-07:00</updated>
+    <published>2015-11-08T19:00:00-05:00</published>
+    <updated>2016-09-30T23:10:14-04:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -672,8 +672,8 @@ or investigate &lt;a href="https://github.com/gabebw"&gt;his myriad of interesti
     <title>How to Turn Sales Leads into Awesome Paid Work</title>
     <link rel="alternate" href="http://adarsh.io/how-to-turn-sales-leads-into-awesome-paid-work"/>
     <id>http://adarsh.io/how-to-turn-sales-leads-into-awesome-paid-work</id>
-    <published>2015-11-03T16:00:00-08:00</published>
-    <updated>2016-09-30T20:10:14-07:00</updated>
+    <published>2015-11-03T19:00:00-05:00</published>
+    <updated>2016-09-30T23:10:14-04:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
@@ -937,8 +937,8 @@ and booming business.&lt;/p&gt;
     <title>How to Generate Sales Leads as a Freelance Developer</title>
     <link rel="alternate" href="http://adarsh.io/how-to-generate-sales-leads-as-a-freelance-developer"/>
     <id>http://adarsh.io/how-to-generate-sales-leads-as-a-freelance-developer</id>
-    <published>2015-10-30T17:00:00-07:00</published>
-    <updated>2016-09-30T20:10:14-07:00</updated>
+    <published>2015-10-30T20:00:00-04:00</published>
+    <updated>2016-09-30T23:10:14-04:00</updated>
     <author>
       <name>Adarsh Pandit</name>
     </author>
